@@ -51,6 +51,7 @@ public class ConverserActivity extends ActionBarActivity {
     private HashMap<String, String> TtsUtteranceMap;
     private ArrayList<ImageView> TtsIndicators;
     private boolean shouldAnimateTtsIndicators;
+    private FreebaseInterface FreebaseInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class ConverserActivity extends ActionBarActivity {
         this.CreateListener();
         this.CreateSpeaker();
         this.CreateTtsIndicators();
+        this.CreateFreebaseInterface();
     }
 
     private void InitStartListeningButton()
@@ -90,7 +92,6 @@ public class ConverserActivity extends ActionBarActivity {
         //disable speechrecognizer beep
         AudioManager AudioManager = (AudioManager) getSystemService(this.AUDIO_SERVICE);
         AudioManager.setStreamMute(AudioManager.VIBRATE_TYPE_NOTIFICATION, true);
-
     }
 
     private void CreateSpeaker()
@@ -142,6 +143,10 @@ public class ConverserActivity extends ActionBarActivity {
         this.TtsIndicators.add(TtsIndicator);
     }
 
+    private void CreateFreebaseInterface()
+    {
+        this.FreebaseInterface = new FreebaseInterface();
+    }
 
     ///////////////////////////
     //callbacks
@@ -195,8 +200,8 @@ public class ConverserActivity extends ActionBarActivity {
     private View.OnClickListener OnClick_listenButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Listen();
-            //StartAnimatingTtsIndicators();
+            //Listen();
+            FreebaseInterface.Foo();
         }
     };
 

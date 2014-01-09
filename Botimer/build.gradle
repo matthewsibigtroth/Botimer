@@ -24,4 +24,22 @@ android {
 
 dependencies {
 	compile 'com.android.support:appcompat-v7:+'
+
+    compile files('libs/google-api-client-1.17.0-rc.jar')
+    compile files('libs/google-api-client-android-1.17.0-rc.jar')
+    compile files('libs/google-api-client-appengine-1.17.0-rc.jar')
+    compile files('libs/google-api-client-servlet-1.17.0-rc.jar')
+    compile files('libs/google-http-client-1.17.0-rc.jar')
+    compile files('libs/json-simple-1.1.1.jar')
 }
+/*
+dependencies {
+    compile files('libs/google-api-client-1.17.0-rc.jar')
+    compile files('libs/google-api-client-android-1.17.0-rc.jar')
+    compile files('libs/google-api-client-appengine-1.17.0-rc.jar')
+    compile files('libs/google-api-client-servlet-1.17.0-rc.jar')
+    compile files('libs/google-http-client-1.17.0-rc.jar')
+    compile files('libs/json-simple-1.1.1.jar')
+}
+*/
+
