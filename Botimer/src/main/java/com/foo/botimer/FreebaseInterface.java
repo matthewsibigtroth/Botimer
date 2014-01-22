@@ -27,6 +27,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import android.support.v7.app.ActionBarActivity;
 
@@ -73,7 +74,9 @@ public class FreebaseInterface
                 try
                 {
                     JSONArray TopicData = FindTopicDataForInputText(inputText__);
-                    JSONObject TopicDatum = new JSONObject(TopicData.get(0).toString());
+                    int numTopics = TopicData.length();
+                    int index_rand = new Random().nextInt(numTopics);
+                    JSONObject TopicDatum = new JSONObject(TopicData.get(index_rand).toString());
                     String url_image = FindImageForTopicDatum(TopicDatum);
                     OnComplete_findImageForInputText(url_image);
                 } catch (IOException e) {
@@ -126,6 +129,9 @@ public class FreebaseInterface
         GenericUrl url = new GenericUrl(url_base_withTopicId);
         url.put("key", "AIzaSyAhwf40hmgjrTc57ije8rqorJ6x-8hKFXE");
         url.put("filter", filter);
+        //url.put("maxwidth", 225);
+        //url.put("maxheight", 225);
+        //url.put("mode", "fillcropmd");
 
         //Log.d("foo", url.toString());
 

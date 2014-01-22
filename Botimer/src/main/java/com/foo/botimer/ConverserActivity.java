@@ -518,6 +518,8 @@ public class ConverserActivity extends ActionBarActivity {
                 RelativeLayout.addView(ImageView);
                 ImageView.setX(x);
                 ImageView.setY(y);
+                ImageView.setScaleX(3);
+                ImageView.setScaleY(3);
                 //this.ImageViews_playSpace.add(ImageView);
                 //return ImageView;
                 ImageView.setImageBitmap(Bitmap_);
@@ -539,11 +541,11 @@ public class ConverserActivity extends ActionBarActivity {
         int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
         int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
         int rotationZ_start = (int)ImageView.getRotation();
-        int rotationZ_stop = new Random().nextInt(720);
+        int rotationZ_stop = new Random().nextInt(35) - 17;
         int rotationX_start = (int)ImageView.getRotationX();
-        int rotationX_stop = new Random().nextInt(720);
+        int rotationX_stop = new Random().nextInt(35) - 17;
         int rotationY_start = (int)ImageView.getRotationY();
-        int rotationY_stop = new Random().nextInt(720);
+        int rotationY_stop = new Random().nextInt(35) - 17;
 
         ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(ImageView, "translationX", x_start, x_stop);
         ObjectAnimator_translateX.setDuration(2000);
