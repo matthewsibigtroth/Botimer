@@ -33,40 +33,49 @@ import android.support.v7.app.ActionBarActivity;
 public class FreebaseInterface
 {
 
-    private ActionBarActivity ConverserActivity_;
+    private ConverserActivity ConverserActivity;
 
-    public FreebaseInterface(ActionBarActivity ConverserActivity)
+    public FreebaseInterface(ConverserActivity ParentActivity)
     {
-        this.ConverserActivity_ = ConverserActivity;
+        this.ConverserActivity = ParentActivity;
 
         this.Init();
     }
 
     private void Init()
     {
-        //this.ConverserActivity_.
+
+    }
+
+    /////////////////////////////////////
+    //callbacks
+    /////////////////////////////////////
+
+    private void OnComplete_findImageForInputText(String url_image) throws IOException {
+        this.ConverserActivity.OnComplete_findImageForInputText(url_image);
     }
 
 
+    /////////////////////////////////////
+    //utilities
+    /////////////////////////////////////
 
     public void FindImageForInputText(String inputText)
     {
-        final ActionBarActivity ParentActivity = this.ConverserActivity_;
         final String inputText_ = inputText.toString();
         new Thread(new Runnable(){
 
             String inputText__ = inputText_;
-            //ActionBarActivity ParentActivity_ = ParentActivity;
-
 
             @Override
-            public void run() {
-                try {
+            public void run()
+            {
+                try
+                {
                     JSONArray TopicData = FindTopicDataForInputText(inputText__);
                     JSONObject TopicDatum = new JSONObject(TopicData.get(0).toString());
                     String url_image = FindImageForTopicDatum(TopicDatum);
-                    //ParentActivity_.OnImageFoundForInputText(url_image);
-                    //ParentActivity.Tes
+                    OnComplete_findImageForInputText(url_image);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -74,8 +83,6 @@ public class FreebaseInterface
                 }
             }
         }).start();
-
-
     }
 
     private JSONArray FindTopicDataForInputText(String inputText) throws IOException, JSONException
@@ -120,8 +127,7 @@ public class FreebaseInterface
         url.put("key", "AIzaSyAhwf40hmgjrTc57ije8rqorJ6x-8hKFXE");
         url.put("filter", filter);
 
-        Log.d("foo", url.toString());
-
+        //Log.d("foo", url.toString());
 
         HttpRequest request = requestFactory.buildGetRequest(url);
         HttpResponse httpResponse = request.execute();

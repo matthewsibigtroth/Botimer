@@ -43,6 +43,11 @@ public class MainActivity extends ActionBarActivity {
         Button.setOnClickListener(OnClick_showConverserButton);
     }
 
+
+    /////////////////////////////////////
+    //callbacks
+    /////////////////////////////////////
+
     private View.OnClickListener OnClick_showConverserButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -71,6 +76,11 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    /////////////////////////////////////
+    //utilities
+    /////////////////////////////////////
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -86,8 +96,6 @@ public class MainActivity extends ActionBarActivity {
             return rootView;
         }
     }
-
-
 
     private void ShowConverser()
     {

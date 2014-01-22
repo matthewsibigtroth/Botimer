@@ -21,4 +21,10 @@
         android:id="@+id/RelativeLayout_ttsIndicator"></RelativeLayout>
 
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:id="@+id/RelativeLayout_mediaCanvas"></RelativeLayout>
+
 </FrameLayout>

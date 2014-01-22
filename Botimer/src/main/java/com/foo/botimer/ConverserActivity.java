@@ -3,6 +3,8 @@ package com.foo.botimer;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -41,6 +43,7 @@ import java.util.Random;
 
 import android.media.AudioManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 
@@ -148,15 +151,10 @@ public class ConverserActivity extends ActionBarActivity {
         this.FreebaseInterface = new FreebaseInterface(this);
     }
 
-    public void OnImageFoundForInputText(String url_image)
-    {
-        Log.d("foo", url_image);
-    }
 
-    ///////////////////////////
+    /////////////////////////////////////
     //callbacks
-    ///////////////////////////
-
+    /////////////////////////////////////
 
     class ttsInitListener implements TextToSpeech.OnInitListener {
 
@@ -207,14 +205,9 @@ public class ConverserActivity extends ActionBarActivity {
         public void onClick(View view) {
             //Listen();
             FreebaseInterface.FindImageForInputText("cat");
+
         }
     };
-
-    public void Test()
-    {
-
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -240,6 +233,10 @@ public class ConverserActivity extends ActionBarActivity {
     {
         Log.d("foo", "heard " + speechRecognized);
         this.SayToBot(speechRecognized);
+    }
+
+    public void OnComplete_findImageForInputText(String url_image) throws IOException {
+        CreateImageViewFromUrl(url_image);
     }
 
 
@@ -486,6 +483,110 @@ public class ConverserActivity extends ActionBarActivity {
         }
     }
 
+    private void CreateImageViewFromUrl(String url_image) throws IOException {
+
+        URL Url = null;
+        try {
+            Url = new URL(url_image);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Bitmap Bitmap = null;
+        try {
+            Bitmap = BitmapFactory.decodeStream(Url.openConnection().getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        final Bitmap Bitmap_ = Bitmap;
+
+
+
+        ConverserActivity.this.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                ImageView ImageView = new ImageView(ConverserActivity.this);
+                //ImageView.setImageResource(R.drawable.frogdesign);
+                //ImageView.setOnTouchListener(OnTouchListener_playSpaceImage);
+                RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
+                int w_layout = RelativeLayout.getWidth();
+                int h_layout = RelativeLayout.getHeight();
+                int x = new Random().nextInt(w_layout);
+                int y = new Random().nextInt(h_layout);
+                ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+                RelativeLayout.addView(ImageView);
+                ImageView.setX(x);
+                ImageView.setY(y);
+                //this.ImageViews_playSpace.add(ImageView);
+                //return ImageView;
+                ImageView.setImageBitmap(Bitmap_);
+                AnimateImageView(ImageView);
+            }
+        });
+
+    }
+
+    private void AnimateImageView(ImageView ImageView)
+    {
+        RelativeLayout RelativeLayout = (RelativeLayout) this.findViewById(R.id.RelativeLayout_mediaCanvas);
+        int w_layout = RelativeLayout.getWidth();
+        int h_layout = RelativeLayout.getHeight();
+        int w_imageView = ImageView.getDrawable().getIntrinsicWidth();
+        int h_imageView = ImageView.getDrawable().getIntrinsicHeight();
+        int x_start = (int)ImageView.getX();
+        int y_start = (int)ImageView.getY();
+        int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
+        int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
+        int rotationZ_start = (int)ImageView.getRotation();
+        int rotationZ_stop = new Random().nextInt(720);
+        int rotationX_start = (int)ImageView.getRotationX();
+        int rotationX_stop = new Random().nextInt(720);
+        int rotationY_start = (int)ImageView.getRotationY();
+        int rotationY_stop = new Random().nextInt(720);
+
+        ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(ImageView, "translationX", x_start, x_stop);
+        ObjectAnimator_translateX.setDuration(2000);
+        ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(ImageView, "translationY", y_start, y_stop);
+        ObjectAnimator_translateY.setDuration(3000);
+        ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(ImageView,  "rotation", rotationZ_start, rotationZ_stop);
+        ObjectAnimator_rotateZ.setDuration(2500);
+        ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(ImageView, "rotationX", rotationX_start, rotationX_stop);
+        ObjectAnimator_rotateX.setDuration(3500);
+        ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(ImageView, "rotationY", rotationY_start, rotationY_stop);
+        ObjectAnimator_rotateY.setDuration(6000);
+
+        ObjectAnimator_rotateY.addListener(AnimatorListener_mediaCanvasImage);
+
+        AnimatorSet AnimatorSet = new AnimatorSet();
+        AnimatorSet.playTogether(ObjectAnimator_translateX, ObjectAnimator_translateY, ObjectAnimator_rotateZ, ObjectAnimator_rotateX, ObjectAnimator_rotateY);
+        AnimatorSet.start();
+    }
+
+    private Animator.AnimatorListener AnimatorListener_mediaCanvasImage = new Animator.AnimatorListener()
+    {
+        @Override
+        public void onAnimationCancel(Animator arg0)
+        {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator Animator)
+        {
+            ImageView ImageView = (ImageView) ((ObjectAnimator) Animator).getTarget();
+            AnimateImageView(ImageView);
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator arg0)
+        {
+        }
+
+        @Override
+        public void onAnimationStart(Animator arg0)
+        {
+        }
+    };
 
 
 }
