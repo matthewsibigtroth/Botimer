@@ -44,7 +44,7 @@ public class FreebaseInterface
 
     private void Init()
     {
-        this.ConverserActivity_.
+        //this.ConverserActivity_.
     }
 
 
@@ -52,7 +52,7 @@ public class FreebaseInterface
     public void FindImageForInputText(String inputText)
     {
         final ActionBarActivity ParentActivity = this.ConverserActivity_;
-        //final String inputText_ = inputText.toString();
+        final String inputText_ = inputText.toString();
         new Thread(new Runnable(){
 
             String inputText__ = inputText_;
