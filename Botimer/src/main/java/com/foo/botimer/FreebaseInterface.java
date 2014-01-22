@@ -52,8 +52,10 @@ public class FreebaseInterface
     //callbacks
     /////////////////////////////////////
 
-    private void OnComplete_findImageForInputText(String url_image) throws IOException {
-        this.ConverserActivity.OnComplete_findImageForInputText(url_image);
+
+    private void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
+    {
+        this.ConverserActivity.OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
     }
 
 
@@ -61,7 +63,7 @@ public class FreebaseInterface
     //utilities
     /////////////////////////////////////
 
-    public void FindImageForInputText(String inputText)
+    public void FindFreebaseNodeDataForInputText(String inputText)
     {
         final String inputText_ = inputText.toString();
         new Thread(new Runnable(){
@@ -77,8 +79,8 @@ public class FreebaseInterface
                     int numTopics = TopicData.length();
                     int index_rand = new Random().nextInt(numTopics);
                     JSONObject TopicDatum = new JSONObject(TopicData.get(index_rand).toString());
-                    String url_image = FindImageForTopicDatum(TopicDatum);
-                    OnComplete_findImageForInputText(url_image);
+                    FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
+                    OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -87,6 +89,7 @@ public class FreebaseInterface
             }
         }).start();
     }
+
 
     private JSONArray FindTopicDataForInputText(String inputText) throws IOException, JSONException
     {
@@ -115,38 +118,76 @@ public class FreebaseInterface
         return TopicData;
     }
 
-    private String FindImageForTopicDatum(JSONObject TopicDatum) throws JSONException, IOException
-    {
+    private FreebaseNodeData CreateFreebaseNodeDataForTopicDatum(JSONObject TopicDatum) throws JSONException, IOException {
+
+        //get the topic id
         String id_topic = TopicDatum.get("id").toString();
 
-        HttpTransport httpTransport = new NetHttpTransport();
-        HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
+        //get the topic name
+        String name = TopicDatum.get("name").toString();
 
+        //get an image for this topic
+        String url_image = this.FindImageForTopic(id_topic);
+
+        //get the article text for this topic
+        String text = this.FindTextForTopic(id_topic);
+
+        //package the data
+        FreebaseNodeData FreebaseNodeData = new FreebaseNodeData(name, id_topic, url_image, text);
+
+        return FreebaseNodeData;
+    }
+
+    private String FindImageForTopic(String id_topic) throws IOException, JSONException {
         String url_base = "https://www.googleapis.com/freebase/v1/topic";
         String url_base_withTopicId = url_base + id_topic;
         String filter = "/common/topic/image&limit=1";
-
         GenericUrl url = new GenericUrl(url_base_withTopicId);
         url.put("key", "AIzaSyAhwf40hmgjrTc57ije8rqorJ6x-8hKFXE");
         url.put("filter", filter);
-        //url.put("maxwidth", 225);
-        //url.put("maxheight", 225);
-        //url.put("mode", "fillcropmd");
-
-        //Log.d("foo", url.toString());
-
-        HttpRequest request = requestFactory.buildGetRequest(url);
+        HttpTransport httpTransport = new NetHttpTransport();
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
+        HttpRequest request= requestFactory.buildGetRequest(url);
         HttpResponse httpResponse = request.execute();
         String json = httpResponse.parseAsString();
-
         JSONObject Blob = new org.json.JSONObject(json);
         String id_image = Blob.get("id").toString();
-
         String url_base_image = "https://usercontent.googleapis.com/freebase/v1/image";
         String url_image = url_base_image + id_image;
-
         return url_image;
     }
+
+    private String FindTextForTopic(String id_topic) throws IOException, JSONException {
+        String url_base = "https://www.googleapis.com/freebase/v1/text";
+        String url_base_withTopicId = url_base + id_topic;
+        GenericUrl url = new GenericUrl(url_base_withTopicId);
+        url.put("key", "AIzaSyAhwf40hmgjrTc57ije8rqorJ6x-8hKFXE");
+        HttpTransport httpTransport = new NetHttpTransport();
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
+        HttpRequest request = requestFactory.buildGetRequest(url);
+        HttpResponse httpResponse_image = request.execute();
+        String json = httpResponse_image.parseAsString();
+        JSONObject Blob = new org.json.JSONObject(json);
+        String text = Blob.get("result").toString();
+        return text;
+    }
+
+    class FreebaseNodeData
+    {
+        public String name;
+        public String id_topic;
+        public String url_image;
+        public String text;
+
+        public FreebaseNodeData(String name, String id_topic, String url_image, String text)
+        {
+            this.name = name;
+            this.id_topic = id_topic;
+            this.url_image = url_image;
+            this.text = text;
+        }
+    }
+
 }
 
 

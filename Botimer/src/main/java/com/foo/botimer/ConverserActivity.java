@@ -3,6 +3,7 @@ package com.foo.botimer;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
@@ -45,6 +47,8 @@ import android.media.AudioManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
 
 
 public class ConverserActivity extends ActionBarActivity {
@@ -204,8 +208,8 @@ public class ConverserActivity extends ActionBarActivity {
         @Override
         public void onClick(View view) {
             //Listen();
-            FreebaseInterface.FindImageForInputText("cat");
-
+            //FreebaseInterface.FindImageForInputText("cat");
+            FreebaseInterface.FindFreebaseNodeDataForInputText("cat");
         }
     };
 
@@ -235,8 +239,10 @@ public class ConverserActivity extends ActionBarActivity {
         this.SayToBot(speechRecognized);
     }
 
-    public void OnComplete_findImageForInputText(String url_image) throws IOException {
-        CreateImageViewFromUrl(url_image);
+    public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
+    {
+        Log.d("foo", FreebaseNodeData.text);
+        CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
     }
 
 
@@ -483,11 +489,15 @@ public class ConverserActivity extends ActionBarActivity {
         }
     }
 
-    private void CreateImageViewFromUrl(String url_image) throws IOException {
 
+
+
+
+    private void CreateImageViewFromFreebaseNodeData(FreebaseNodeData FreebaseNodeData)
+    {
         URL Url = null;
         try {
-            Url = new URL(url_image);
+            Url = new URL(FreebaseNodeData.url_image);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -499,35 +509,64 @@ public class ConverserActivity extends ActionBarActivity {
         }
 
         final Bitmap Bitmap_ = Bitmap;
-
+        final FreebaseNodeData FreebaseNodeData_ = FreebaseNodeData;
 
 
         ConverserActivity.this.runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-                ImageView ImageView = new ImageView(ConverserActivity.this);
-                //ImageView.setImageResource(R.drawable.frogdesign);
-                //ImageView.setOnTouchListener(OnTouchListener_playSpaceImage);
+                FreebaseImage FreebaseImage = new FreebaseImage(ConverserActivity.this, FreebaseNodeData_);
+                FreebaseImage.setOnTouchListener(OnTouchListener_freebaseImage);
                 RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
                 int w_layout = RelativeLayout.getWidth();
                 int h_layout = RelativeLayout.getHeight();
                 int x = new Random().nextInt(w_layout);
                 int y = new Random().nextInt(h_layout);
-                ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
-                RelativeLayout.addView(ImageView);
-                ImageView.setX(x);
-                ImageView.setY(y);
-                ImageView.setScaleX(3);
-                ImageView.setScaleY(3);
+                FreebaseImage.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+                RelativeLayout.addView(FreebaseImage);
+                FreebaseImage.setX(x);
+                FreebaseImage.setY(y);
+                FreebaseImage.setScaleX(3);
+                FreebaseImage.setScaleY(3);
                 //this.ImageViews_playSpace.add(ImageView);
                 //return ImageView;
-                ImageView.setImageBitmap(Bitmap_);
-                AnimateImageView(ImageView);
+                FreebaseImage.setImageBitmap(Bitmap_);
+                AnimateImageView(FreebaseImage);
             }
         });
-
     }
+
+    class FreebaseImage extends ImageView
+    {
+
+        public FreebaseNodeData FreebaseNodeData;
+
+        public FreebaseImage(Context Context, FreebaseNodeData FreebaseNodeData)
+        {
+            super(Context);
+
+            this.FreebaseNodeData = FreebaseNodeData;
+        }
+    }
+
+    private View.OnTouchListener OnTouchListener_freebaseImage = new View.OnTouchListener()
+    {
+        @Override
+        public boolean onTouch(View View, MotionEvent event)
+        {
+            if (event.getAction() == android.view.MotionEvent.ACTION_UP)
+            {
+                Log.d("foo", "onTouchUp");
+                FreebaseImage FreebaseImage = (FreebaseImage)View;
+                Log.d("foo", FreebaseImage.FreebaseNodeData.name.toString());
+
+                String name = FreebaseImage.FreebaseNodeData.name.toString();
+                ConverserActivity.this.FreebaseInterface.FindFreebaseNodeDataForInputText(name);
+            }
+            return true; //stop the propagation
+        }
+    };
 
     private void AnimateImageView(ImageView ImageView)
     {
@@ -589,6 +628,5 @@ public class ConverserActivity extends ActionBarActivity {
         {
         }
     };
-
 
 }
