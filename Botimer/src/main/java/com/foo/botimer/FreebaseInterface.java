@@ -10,9 +10,11 @@ package com.foo.botimer;
 
 import android.util.Log;
 
-import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 
 
 import com.google.api.client.http.GenericUrl;
@@ -22,83 +24,119 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import android.support.v7.app.ActionBarActivity;
 
 public class FreebaseInterface
 {
 
-    public FreebaseInterface()
+    private ActionBarActivity ConverserActivity_;
+
+    public FreebaseInterface(ActionBarActivity ConverserActivity)
     {
+        this.ConverserActivity_ = ConverserActivity;
+
         this.Init();
     }
 
     private void Init()
     {
+        this.ConverserActivity_.
+    }
+
+
+
+    public void FindImageForInputText(String inputText)
+    {
+        final ActionBarActivity ParentActivity = this.ConverserActivity_;
+        //final String inputText_ = inputText.toString();
+        new Thread(new Runnable(){
+
+            String inputText__ = inputText_;
+            //ActionBarActivity ParentActivity_ = ParentActivity;
+
+
+            @Override
+            public void run() {
+                try {
+                    JSONArray TopicData = FindTopicDataForInputText(inputText__);
+                    JSONObject TopicDatum = new JSONObject(TopicData.get(0).toString());
+                    String url_image = FindImageForTopicDatum(TopicDatum);
+                    //ParentActivity_.OnImageFoundForInputText(url_image);
+                    //ParentActivity.Tes
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
 
     }
 
-    public void Foo()
+    private JSONArray FindTopicDataForInputText(String inputText) throws IOException, JSONException
     {
+        HttpTransport httpTransport = new NetHttpTransport();
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
 
-        try
+        String query = inputText.toString();
+        GenericUrl url = new GenericUrl("https://www.googleapis.com/freebase/v1/search");
+        url.put("key", "AIzaSyAhwf40hmgjrTc57ije8rqorJ6x-8hKFXE");
+        url.put("query", query);
+
+        HttpRequest request = requestFactory.buildGetRequest(url);
+        HttpResponse httpResponse = request.execute();
+        String json = httpResponse.parseAsString();
+
+        JSONObject Blob = new org.json.JSONObject(json);
+        JSONArray TopicData = Blob.getJSONArray("result");
+
+        for (int i=0; i<TopicData.length(); i++)
         {
-            HttpTransport httpTransport = new NetHttpTransport();
-            HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
-            JSONParser parser = new JSONParser();
-            String query = "[{\"limit\": 5,\"name\":null,\"type\":\"/medicine/disease\"}]";
-            GenericUrl url = new GenericUrl("https://www.googleapis.com/freebase/v1/mqlread");
-            url.put("key", "AIzaSyAhwf40hmgjrTc57ije8rqorJ6x-8hKFXE");
-            url.put("query", query);
-            HttpRequest request = requestFactory.buildGetRequest(url);
-            HttpResponse httpResponse = request.execute();
-            JSONObject response = (JSONObject)parser.parse(httpResponse.parseAsString());
-            JSONArray results = (JSONArray)response.get("result");
-
-            for (int i=0; i<results.length(); i++)
-            {
-                Log.d("foo", results.get(i).toString());
-                //Log.d("foo", result.get("name").toString());
-            }
-
-            //for (Object result : results) {
-            //    System.out.println(result.get("name").toString());
-            //}
-        }
-        catch(Exception e)
-        {
-            Log.d("foo", "error: Foo");
+            JSONObject TopicDatum = new JSONObject(TopicData.get(i).toString());
+            String name = TopicDatum.get("name").toString();
+            Log.d("foo", name);
         }
 
+        return TopicData;
+    }
+
+    private String FindImageForTopicDatum(JSONObject TopicDatum) throws JSONException, IOException
+    {
+        String id_topic = TopicDatum.get("id").toString();
+
+        HttpTransport httpTransport = new NetHttpTransport();
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
+
+        String url_base = "https://www.googleapis.com/freebase/v1/topic";
+        String url_base_withTopicId = url_base + id_topic;
+        String filter = "/common/topic/image&limit=1";
+
+        GenericUrl url = new GenericUrl(url_base_withTopicId);
+        url.put("key", "AIzaSyAhwf40hmgjrTc57ije8rqorJ6x-8hKFXE");
+        url.put("filter", filter);
+
+        Log.d("foo", url.toString());
 
 
+        HttpRequest request = requestFactory.buildGetRequest(url);
+        HttpResponse httpResponse = request.execute();
+        String json = httpResponse.parseAsString();
+
+        JSONObject Blob = new org.json.JSONObject(json);
+        String id_image = Blob.get("id").toString();
+
+        String url_base_image = "https://usercontent.googleapis.com/freebase/v1/image";
+        String url_image = url_base_image + id_image;
+
+        return url_image;
     }
 }
 
-    /*
-    public static void searchTest(String query, String key, String params) throws IOException
-    {
-        String query_envelope = "{\"query\":" + query + "}";
-        String service_url = "https://www.googleapis.com/freebase/v1/search";
 
-        String url = service_url    + "?query=" + URLEncoder.encode(query, "UTF-8")
-                + params
-                + "&key=" + key;
-
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpResponse response = httpclient.execute(new HttpGet(url));
-
-        JsonParser parser = new JsonParser();
-        JsonObject json_data =
-                (JsonObject)parser.parse(EntityUtils.toString(response.getEntity()));
-        JsonArray results = (JsonArray)json_data.get("result");
-
-        if(results != null)
-        {
-            for (Object planet : results)
-            {
-                System.out.println(((JsonObject)planet).get("name"));
-            }
-        }
-    }
-    */
 
 

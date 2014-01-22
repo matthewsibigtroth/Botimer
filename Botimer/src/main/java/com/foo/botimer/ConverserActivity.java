@@ -74,7 +74,7 @@ public class ConverserActivity extends ActionBarActivity {
 
         this.InitStartListeningButton();
         this.CreateListener();
-        this.CreateSpeaker();
+        //this.CreateSpeaker();
         this.CreateTtsIndicators();
         this.CreateFreebaseInterface();
     }
@@ -145,7 +145,12 @@ public class ConverserActivity extends ActionBarActivity {
 
     private void CreateFreebaseInterface()
     {
-        this.FreebaseInterface = new FreebaseInterface();
+        this.FreebaseInterface = new FreebaseInterface(this);
+    }
+
+    public void OnImageFoundForInputText(String url_image)
+    {
+        Log.d("foo", url_image);
     }
 
     ///////////////////////////
@@ -201,9 +206,15 @@ public class ConverserActivity extends ActionBarActivity {
         @Override
         public void onClick(View view) {
             //Listen();
-            FreebaseInterface.Foo();
+            FreebaseInterface.FindImageForInputText("cat");
         }
     };
+
+    public void Test()
+    {
+
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
