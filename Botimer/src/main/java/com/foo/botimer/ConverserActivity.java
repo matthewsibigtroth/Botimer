@@ -6,12 +6,16 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.AsyncTask;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +48,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import android.media.AudioManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -60,6 +65,8 @@ public class ConverserActivity extends ActionBarActivity {
     private boolean shouldAnimateTtsIndicators;
     private FreebaseInterface FreebaseInterface;
     private Random Random;
+    private GestureDetectorCompat GestureDetectorCompat;
+    private View AdminView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,8 @@ public class ConverserActivity extends ActionBarActivity {
         this.CreateSpeaker();
         this.CreateTtsIndicators();
         this.CreateFreebaseInterface();
+        this.CreateGestureListener();
+        this.CreateAdminView();
     }
 
     private void InitStartListeningButton()
@@ -155,6 +164,24 @@ public class ConverserActivity extends ActionBarActivity {
     private void CreateFreebaseInterface()
     {
         this.FreebaseInterface = new FreebaseInterface(this);
+    }
+
+    private void CreateGestureListener()
+    {
+        this.GestureDetectorCompat = new GestureDetectorCompat(this, new simpleGestureListener());
+    }
+
+    private void CreateAdminView()
+    {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int w_screen = size.x;
+        this.AdminView = new View(this);
+        this.AdminView.setBackgroundColor(0xFF00FF00);
+        this.AdminView.setX(-w_screen);
+        FrameLayout FrameLayout = (FrameLayout) findViewById(R.id.container);
+        FrameLayout.addView(this.AdminView);
     }
 
 
@@ -246,6 +273,40 @@ public class ConverserActivity extends ActionBarActivity {
         CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        this.GestureDetectorCompat.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    class simpleGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d("foo","onDown: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+            Log.d("foo", "onFling: " + event1.toString()+event2.toString());
+            Log.d("foo", String.valueOf(velocityX));
+            if (velocityX < 0) {OnFlingLeft_this();}
+            else {OnFlingRight_this();}
+            return true;
+        }
+    }
+
+    private void OnFlingLeft_this()
+    {
+        this.HideAdminView();
+
+    }
+
+    private void OnFlingRight_this()
+    {
+        this.ShowAdminView();
+    }
 
     ///////////////////////////
     //utilities
@@ -257,7 +318,7 @@ public class ConverserActivity extends ActionBarActivity {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         //intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,5);
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
         this.Listener.startListening(intent);
     }
 
@@ -673,5 +734,31 @@ public class ConverserActivity extends ActionBarActivity {
         {
         }
     };
+
+
+    private void HideAdminView()
+    {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int w_screen = size.x;
+
+        int duration  = 500;
+        float x_start = this.AdminView.getX();
+        float x_stop = -w_screen;
+        ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(this.AdminView, "x", x_start, x_stop);
+        ObjectAnimator_x.setDuration(duration);
+        ObjectAnimator_x.start();
+    }
+
+    private void ShowAdminView()
+    {
+        int duration  = 500;
+        float x_start = this.AdminView.getX();
+        float x_stop = 0;
+        ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(this.AdminView, "x", x_start, x_stop);
+        ObjectAnimator_x.setDuration(duration);
+        ObjectAnimator_x.start();
+    }
 
 }
