@@ -65,7 +65,7 @@ public class FreebaseInterface
 
     public void FindFreebaseNodeDataForInputText(String inputText)
     {
-        final String inputText_ = inputText.toString();
+        final String inputText_ = inputText.replace(" ", "_").toString();
         new Thread(new Runnable(){
 
             String inputText__ = inputText_;
@@ -81,6 +81,14 @@ public class FreebaseInterface
                     JSONObject TopicDatum = new JSONObject(TopicData.get(index_rand).toString());
                     FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
                     OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
+
+                    //for (int i=0; i<numTopics; i++)
+                    //{
+                    //    JSONObject TopicDatum = new JSONObject(TopicData.get(i).toString());
+                    //    FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
+                    //    OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
+                    //}
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -127,6 +135,7 @@ public class FreebaseInterface
 
         //get an image for this topic
         String url_image = this.FindImageForTopic(id_topic);
+        Log.d("foo", url_image);
 
         //get the article text for this topic
         String text = this.FindTextForTopic(id_topic);

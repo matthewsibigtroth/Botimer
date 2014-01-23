@@ -59,6 +59,7 @@ public class ConverserActivity extends ActionBarActivity {
     private ArrayList<ImageView> TtsIndicators;
     private boolean shouldAnimateTtsIndicators;
     private FreebaseInterface FreebaseInterface;
+    private Random Random;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,7 @@ public class ConverserActivity extends ActionBarActivity {
     {
         this.TtsIndicators = new ArrayList<ImageView>();
         this.shouldAnimateTtsIndicators = false;
+        this.Random = new Random();
 
         this.InitStartListeningButton();
         //this.CreateListener();
@@ -113,7 +115,7 @@ public class ConverserActivity extends ActionBarActivity {
         int numRows = 3;
         int numColumns = 30;
         int w_tile = 40;
-        int h_tile = 30;
+        int h_tile = 40;
         int offsetX = w_tile/2;
         int offsetY = h_tile/2 + 150;
         for (int i=0; i<numRows; i++)
@@ -208,8 +210,7 @@ public class ConverserActivity extends ActionBarActivity {
         @Override
         public void onClick(View view) {
             //Listen();
-            //FreebaseInterface.FindImageForInputText("cat");
-            FreebaseInterface.FindFreebaseNodeDataForInputText("cat");
+            FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
             //Speak("this is a test");
         }
     };
@@ -351,8 +352,12 @@ public class ConverserActivity extends ActionBarActivity {
 
         for (int i=0; i<this.TtsIndicators.size(); i++)
         {
-            ImageView TtsIndicator = this.TtsIndicators.get(i);
-            this.ScaleUpTtsIndicator(TtsIndicator);
+            float randNum = this.Random.nextFloat();
+            if (randNum < .25)
+            {
+                ImageView TtsIndicator = this.TtsIndicators.get(i);
+                this.ScaleUpTtsIndicator(TtsIndicator);
+            }
         }
     }
 
@@ -489,10 +494,6 @@ public class ConverserActivity extends ActionBarActivity {
         }
     }
 
-
-
-
-
     private void CreateImageViewFromFreebaseNodeData(FreebaseNodeData FreebaseNodeData)
     {
         URL Url = null;
@@ -564,10 +565,8 @@ public class ConverserActivity extends ActionBarActivity {
                 String text = FreebaseImage.FreebaseNodeData.text;
                 String[] Sentences = text.split("\\.");
                 String firstSentence = Sentences[0];
-                Log.d("foo", "*******  " + text);
-                Log.d("foo", "*******  " + firstSentence);
-                Log.d("foo", "*******  " + Sentences.length);
                 Speak(firstSentence);
+                FadeOutImageView(FreebaseImage);
             }
             return true; //stop the propagation
         }
@@ -602,14 +601,14 @@ public class ConverserActivity extends ActionBarActivity {
         ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(ImageView, "rotationY", rotationY_start, rotationY_stop);
         ObjectAnimator_rotateY.setDuration(6000);
 
-        ObjectAnimator_rotateY.addListener(AnimatorListener_mediaCanvasImage);
+        ObjectAnimator_rotateY.addListener(AnimatorListener_mediaCanvasImage_animate);
 
         AnimatorSet AnimatorSet = new AnimatorSet();
         AnimatorSet.playTogether(ObjectAnimator_translateX, ObjectAnimator_translateY, ObjectAnimator_rotateZ, ObjectAnimator_rotateX, ObjectAnimator_rotateY);
         AnimatorSet.start();
     }
 
-    private Animator.AnimatorListener AnimatorListener_mediaCanvasImage = new Animator.AnimatorListener()
+    private Animator.AnimatorListener AnimatorListener_mediaCanvasImage_animate = new Animator.AnimatorListener()
     {
         @Override
         public void onAnimationCancel(Animator arg0)
@@ -621,6 +620,47 @@ public class ConverserActivity extends ActionBarActivity {
         {
             ImageView ImageView = (ImageView) ((ObjectAnimator) Animator).getTarget();
             AnimateImageView(ImageView);
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator arg0)
+        {
+        }
+
+        @Override
+        public void onAnimationStart(Animator arg0)
+        {
+        }
+    };
+
+    private void FadeOutImageView(ImageView ImageView)
+    {
+        float alpha_start = (int)ImageView.getAlpha();
+        float alpha_stop = 0;
+
+        ObjectAnimator ObjectAnimator_alpha = ObjectAnimator.ofFloat(ImageView, "alpha", alpha_start, alpha_stop);
+        ObjectAnimator_alpha.setDuration(5000);
+
+        ObjectAnimator_alpha.addListener(AnimatorListener_mediaCanvasImage_fadeOut);
+
+        AnimatorSet AnimatorSet = new AnimatorSet();
+        AnimatorSet.playTogether(ObjectAnimator_alpha);
+        AnimatorSet.start();
+    }
+
+    private Animator.AnimatorListener AnimatorListener_mediaCanvasImage_fadeOut = new Animator.AnimatorListener()
+    {
+        @Override
+        public void onAnimationCancel(Animator arg0)
+        {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator Animator)
+        {
+            ImageView ImageView = (ImageView) ((ObjectAnimator) Animator).getTarget();
+            RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
+            RelativeLayout.removeView(ImageView);
         }
 
         @Override
