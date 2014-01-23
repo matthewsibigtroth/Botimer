@@ -65,6 +65,7 @@ public class FreebaseInterface
 
     public void FindFreebaseNodeDataForInputText(String inputText)
     {
+        this.ConverserActivity.PrintToDebugOutput("finding freebase node for:  " + inputText);
         final String inputText_ = inputText.replace(" ", "_").toString();
         new Thread(new Runnable(){
 
@@ -120,6 +121,7 @@ public class FreebaseInterface
             JSONObject TopicDatum = new JSONObject(TopicData.get(i).toString());
             String name = TopicDatum.get("name").toString();
             Log.d("foo", name);
+            this.ConverserActivity.PrintToDebugOutput("found topic:  " + name);
         }
 
         return TopicData;
@@ -162,6 +164,7 @@ public class FreebaseInterface
         String id_image = Blob.get("id").toString();
         String url_base_image = "https://usercontent.googleapis.com/freebase/v1/image";
         String url_image = url_base_image + id_image;
+        this.ConverserActivity.PrintToDebugOutput("found image:  " + url_image);
         return url_image;
     }
 
@@ -177,6 +180,7 @@ public class FreebaseInterface
         String json = httpResponse_image.parseAsString();
         JSONObject Blob = new org.json.JSONObject(json);
         String text = Blob.get("result").toString();
+        this.ConverserActivity.PrintToDebugOutput("found text:  " + text);
         return text;
     }
 

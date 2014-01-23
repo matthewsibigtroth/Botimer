@@ -32,6 +32,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.content.Intent;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 
@@ -53,6 +54,7 @@ import android.media.AudioManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
@@ -68,9 +70,11 @@ public class ConverserActivity extends Activity {
     private FreebaseInterface FreebaseInterface;
     private Random Random;
     private GestureDetectorCompat GestureDetectorCompat;
-    private RelativeLayout AdminView;
+    private LinearLayout AdminView;
     private Button ListenButton;
-    private RelativeLayout RelativeLayout_adminView;
+    private ListView DebugListView;
+    private ArrayList<String> DebugOutput;
+    private ArrayAdapter<String> DebugArrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +98,7 @@ public class ConverserActivity extends Activity {
         this.CreateGestureListener();
         this.CreateAdminView();
         this.CreateListenButton();
+        this.CreateDebugListView();
     }
 
     private void CreateListener()
@@ -170,7 +175,8 @@ public class ConverserActivity extends Activity {
         Point size = new Point();
         display.getSize(size);
         int w_screen = size.x;
-        this.AdminView = new RelativeLayout(this);
+        this.AdminView = new LinearLayout(this);
+        this.AdminView.setOrientation(LinearLayout.VERTICAL);
         this.AdminView.setBackgroundColor(0xFF444444);
         this.AdminView.setX(-w_screen);
         FrameLayout FrameLayout = (FrameLayout) findViewById(R.id.container);
@@ -182,9 +188,20 @@ public class ConverserActivity extends Activity {
         this.ListenButton = new Button(this);
         this.ListenButton.setText("Listen");
         this.ListenButton.setOnClickListener(OnClick_listenButton);
-        ViewGroup.LayoutParams LayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams LayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.ListenButton.setLayoutParams(LayoutParams);
         this.AdminView.addView(this.ListenButton);
+    }
+
+    private void CreateDebugListView()
+    {
+        this.DebugListView = new ListView(this);
+        ViewGroup.LayoutParams LayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        this.DebugListView.setLayoutParams(LayoutParams);
+        this.AdminView.addView(this.DebugListView);
+        this.DebugOutput = new ArrayList<String>();
+        this.DebugArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, this.DebugOutput);
+        this.DebugListView.setAdapter(this.DebugArrayAdapter);
     }
 
     /////////////////////////////////////
@@ -238,8 +255,8 @@ public class ConverserActivity extends Activity {
     private View.OnClickListener OnClick_listenButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Listen();
-            FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
+            Listen();
+            //FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
             //Speak("this is a test");
         }
     };
@@ -267,6 +284,7 @@ public class ConverserActivity extends Activity {
     private void OnSpeechRecognized(String speechRecognized)
     {
         Log.d("foo", "heard " + speechRecognized);
+        this.PrintToDebugOutput("speech recognizer heard:  " + speechRecognized);
         this.SayToBot(speechRecognized);
     }
 
@@ -302,7 +320,6 @@ public class ConverserActivity extends Activity {
     private void OnFlingLeft_this()
     {
         this.HideAdminView();
-
     }
 
     private void OnFlingRight_this()
@@ -314,9 +331,24 @@ public class ConverserActivity extends Activity {
     //utilities
     ///////////////////////////
 
+    public void PrintToDebugOutput(String textToPrint)
+    {
+        final String textToPrint_ = textToPrint;
+        ConverserActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DebugOutput.add(textToPrint_.toString());
+                DebugArrayAdapter.notifyDataSetChanged();
+                DebugListView.setSelection(DebugArrayAdapter.getCount() - 1);
+            }
+        });
+
+    }
+
     private void Listen()
     {
         Log.d("foo", "StartListening");
+        this.PrintToDebugOutput("listening...");
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         //intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
@@ -327,6 +359,7 @@ public class ConverserActivity extends Activity {
     private void Speak(String textToSpeak)
     {
         Log.d("foo", "speak:    " + textToSpeak);
+        this.PrintToDebugOutput("speaking tts:  " + textToSpeak);
         this.TtsUtteranceMap.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
         this.Speaker.speak(textToSpeak, TextToSpeech.QUEUE_ADD, this.TtsUtteranceMap);
     }
@@ -334,6 +367,7 @@ public class ConverserActivity extends Activity {
     private void SayToBot(String textToSpeak)
     {
         final String textToSpeak_ = textToSpeak;
+        this.PrintToDebugOutput("saying to pandorabot:  " + textToSpeak);
 
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
 
@@ -608,6 +642,7 @@ public class ConverserActivity extends Activity {
                 Log.d("foo", "onTouchUp");
                 FreebaseImage FreebaseImage = (FreebaseImage)View;
                 String name = FreebaseImage.FreebaseNodeData.name.toString();
+                PrintToDebugOutput("onTouch freebaseImage:  " + name);
                 ConverserActivity.this.FreebaseInterface.FindFreebaseNodeDataForInputText(name);
                 String text = FreebaseImage.FreebaseNodeData.text;
                 String[] Sentences = text.split("\\.");
