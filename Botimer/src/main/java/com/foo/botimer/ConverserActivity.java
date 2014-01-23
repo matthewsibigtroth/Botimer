@@ -3,6 +3,7 @@ package com.foo.botimer;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,6 +31,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.content.Intent;
+import android.view.Window;
 import android.widget.Button;
 
 
@@ -56,7 +58,7 @@ import android.widget.RelativeLayout;
 import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
 
 
-public class ConverserActivity extends ActionBarActivity {
+public class ConverserActivity extends Activity {
 
     private SpeechRecognizer Listener;
     private TextToSpeech Speaker;
@@ -66,18 +68,15 @@ public class ConverserActivity extends ActionBarActivity {
     private FreebaseInterface FreebaseInterface;
     private Random Random;
     private GestureDetectorCompat GestureDetectorCompat;
-    private View AdminView;
+    private RelativeLayout AdminView;
+    private Button ListenButton;
+    private RelativeLayout RelativeLayout_adminView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_converser);
-
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
-        }
 
         this.Init();
     }
@@ -88,19 +87,13 @@ public class ConverserActivity extends ActionBarActivity {
         this.shouldAnimateTtsIndicators = false;
         this.Random = new Random();
 
-        this.InitStartListeningButton();
-        //this.CreateListener();
+        this.CreateListener();
         this.CreateSpeaker();
         this.CreateTtsIndicators();
         this.CreateFreebaseInterface();
         this.CreateGestureListener();
         this.CreateAdminView();
-    }
-
-    private void InitStartListeningButton()
-    {
-        final Button Button = (Button) findViewById(R.id.Button_listen);
-        Button.setOnClickListener(OnClick_listenButton);
+        this.CreateListenButton();
     }
 
     private void CreateListener()
@@ -177,13 +170,22 @@ public class ConverserActivity extends ActionBarActivity {
         Point size = new Point();
         display.getSize(size);
         int w_screen = size.x;
-        this.AdminView = new View(this);
-        this.AdminView.setBackgroundColor(0xFF00FF00);
+        this.AdminView = new RelativeLayout(this);
+        this.AdminView.setBackgroundColor(0xFF444444);
         this.AdminView.setX(-w_screen);
         FrameLayout FrameLayout = (FrameLayout) findViewById(R.id.container);
         FrameLayout.addView(this.AdminView);
     }
 
+    private void CreateListenButton()
+    {
+        this.ListenButton = new Button(this);
+        this.ListenButton.setText("Listen");
+        this.ListenButton.setOnClickListener(OnClick_listenButton);
+        ViewGroup.LayoutParams LayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        this.ListenButton.setLayoutParams(LayoutParams);
+        this.AdminView.addView(this.ListenButton);
+    }
 
     /////////////////////////////////////
     //callbacks
@@ -536,22 +538,6 @@ public class ConverserActivity extends ActionBarActivity {
         public void onEvent(int eventType, Bundle params)
         {
             //Log.d(TAG, "onEvent " + eventType);
-        }
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_converser, container, false);
-            return rootView;
         }
     }
 

@@ -7,13 +7,6 @@
     tools:ignore="MergeRootFrame"
     android:background="#000000">
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Listen"
-        android:id="@+id/Button_listen"
-        android:layout_gravity="left|top" />
-
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
