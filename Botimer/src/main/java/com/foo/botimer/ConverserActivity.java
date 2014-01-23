@@ -80,8 +80,8 @@ public class ConverserActivity extends ActionBarActivity {
         this.shouldAnimateTtsIndicators = false;
 
         this.InitStartListeningButton();
-        this.CreateListener();
-        //this.CreateSpeaker();
+        //this.CreateListener();
+        this.CreateSpeaker();
         this.CreateTtsIndicators();
         this.CreateFreebaseInterface();
     }
@@ -132,7 +132,7 @@ public class ConverserActivity extends ActionBarActivity {
     private void CreateTtsIndicator(float x, float y)
     {
         ImageView TtsIndicator = new ImageView(this);
-        TtsIndicator.setImageResource(R.drawable.circuit);
+        TtsIndicator.setImageResource(R.drawable.circle);
         RelativeLayout RelativeLayout = (RelativeLayout) findViewById(R.id.RelativeLayout_ttsIndicator);
         TtsIndicator.setScaleType(android.widget.ImageView.ScaleType.CENTER);
         RelativeLayout.addView(TtsIndicator);
@@ -183,7 +183,7 @@ public class ConverserActivity extends ActionBarActivity {
                 @Override
                 public void run() {
                     StopAnimatingTtsIndicators();
-                    Listen();
+                    //Listen();
                 }
             });
         }
@@ -210,6 +210,7 @@ public class ConverserActivity extends ActionBarActivity {
             //Listen();
             //FreebaseInterface.FindImageForInputText("cat");
             FreebaseInterface.FindFreebaseNodeDataForInputText("cat");
+            //Speak("this is a test");
         }
     };
 
@@ -241,7 +242,6 @@ public class ConverserActivity extends ActionBarActivity {
 
     public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
     {
-        Log.d("foo", FreebaseNodeData.text);
         CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
     }
 
@@ -262,9 +262,9 @@ public class ConverserActivity extends ActionBarActivity {
 
     private void Speak(String textToSpeak)
     {
+        Log.d("foo", "speak:    " + textToSpeak);
         this.TtsUtteranceMap.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
         this.Speaker.speak(textToSpeak, TextToSpeech.QUEUE_ADD, this.TtsUtteranceMap);
-        //this.AttractAllImageViewsToGivenPosition(200,200);
     }
 
     private void SayToBot(String textToSpeak)
@@ -559,10 +559,15 @@ public class ConverserActivity extends ActionBarActivity {
             {
                 Log.d("foo", "onTouchUp");
                 FreebaseImage FreebaseImage = (FreebaseImage)View;
-                Log.d("foo", FreebaseImage.FreebaseNodeData.name.toString());
-
                 String name = FreebaseImage.FreebaseNodeData.name.toString();
                 ConverserActivity.this.FreebaseInterface.FindFreebaseNodeDataForInputText(name);
+                String text = FreebaseImage.FreebaseNodeData.text;
+                String[] Sentences = text.split("\\.");
+                String firstSentence = Sentences[0];
+                Log.d("foo", "*******  " + text);
+                Log.d("foo", "*******  " + firstSentence);
+                Log.d("foo", "*******  " + Sentences.length);
+                Speak(firstSentence);
             }
             return true; //stop the propagation
         }

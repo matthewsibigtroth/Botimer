@@ -90,7 +90,6 @@ public class FreebaseInterface
         }).start();
     }
 
-
     private JSONArray FindTopicDataForInputText(String inputText) throws IOException, JSONException
     {
         HttpTransport httpTransport = new NetHttpTransport();
