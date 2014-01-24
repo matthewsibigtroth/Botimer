@@ -231,7 +231,7 @@ public class ConverserActivity extends Activity {
                 @Override
                 public void run() {
                     StopAnimatingTtsIndicators();
-                    //Listen();
+                    Listen();
                 }
             });
         }
@@ -255,8 +255,8 @@ public class ConverserActivity extends Activity {
     private View.OnClickListener OnClick_listenButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Listen();
-            FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
+            Listen();
+            //FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
             //Speak("this is a test");
         }
     };
@@ -790,7 +790,7 @@ public class ConverserActivity extends Activity {
     {
         int duration  = 500;
         float x_start = this.AdminView.getX();
-        float x_stop = 0;
+        float x_stop = 0 - 100;
         ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(this.AdminView, "x", x_start, x_stop);
         ObjectAnimator_x.setDuration(duration);
         ObjectAnimator_x.start();
