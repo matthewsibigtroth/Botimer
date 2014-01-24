@@ -77,6 +77,32 @@ public class FreebaseInterface
                 try
                 {
                     JSONArray TopicData = FindTopicDataForInputText(inputText__);
+                    JSONObject TopicDatum = new JSONObject(TopicData.get(0).toString());
+                    FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
+                    OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void FindRelatedFreebaseNodeDataForInputText(String inputText)
+    {
+        this.ConverserActivity.PrintToDebugOutput("finding freebase node for:  " + inputText);
+        final String inputText_ = inputText.replace(" ", "_").toString();
+        new Thread(new Runnable(){
+
+            String inputText__ = inputText_;
+
+            @Override
+            public void run()
+            {
+                try
+                {
+                    JSONArray TopicData = FindTopicDataForInputText(inputText__);
                     int numTopics = TopicData.length();
                     int index_rand = new Random().nextInt(numTopics);
                     JSONObject TopicDatum = new JSONObject(TopicData.get(index_rand).toString());

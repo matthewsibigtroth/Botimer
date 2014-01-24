@@ -75,6 +75,7 @@ public class ConverserActivity extends Activity {
     private ListView DebugListView;
     private ArrayList<String> DebugOutput;
     private ArrayAdapter<String> DebugArrayAdapter;
+    private RecognitionListenerExtended RecognitionListenerExtended;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,23 +92,25 @@ public class ConverserActivity extends Activity {
         this.shouldAnimateTtsIndicators = false;
         this.Random = new Random();
 
+        this.CreateAdminView();
+        this.CreateListenButton();
+        this.CreateDebugListView();
         this.CreateListener();
         this.CreateSpeaker();
         this.CreateTtsIndicators();
         this.CreateFreebaseInterface();
         this.CreateGestureListener();
-        this.CreateAdminView();
-        this.CreateListenButton();
-        this.CreateDebugListView();
     }
 
     private void CreateListener()
     {
         this.Listener = SpeechRecognizer.createSpeechRecognizer(this);
-        this.Listener.setRecognitionListener(new RecognitionListenerExtended());
+        this.RecognitionListenerExtended = new RecognitionListenerExtended();
+        this.Listener.setRecognitionListener(this.RecognitionListenerExtended);
         //disable speechrecognizer beep
         AudioManager AudioManager = (AudioManager) getSystemService(this.AUDIO_SERVICE);
         AudioManager.setStreamMute(AudioManager.VIBRATE_TYPE_NOTIFICATION, true);
+        this.Listen();
     }
 
     private void CreateSpeaker()
@@ -175,10 +178,16 @@ public class ConverserActivity extends Activity {
         Point size = new Point();
         display.getSize(size);
         int w_screen = size.x;
+        int h_screen = size.y;
         this.AdminView = new LinearLayout(this);
+        LinearLayout.LayoutParams LayoutParams =new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        this.AdminView.setLayoutParams(LayoutParams);
+        this.AdminView.getLayoutParams().height = h_screen;
+        this.AdminView.getLayoutParams().width = (int)((float)w_screen*.8f);
         this.AdminView.setOrientation(LinearLayout.VERTICAL);
         this.AdminView.setBackgroundColor(0xFF444444);
         this.AdminView.setX(-w_screen);
+        this.AdminView.setAlpha(.9f);
         FrameLayout FrameLayout = (FrameLayout) findViewById(R.id.container);
         FrameLayout.addView(this.AdminView);
     }
@@ -188,7 +197,7 @@ public class ConverserActivity extends Activity {
         this.ListenButton = new Button(this);
         this.ListenButton.setText("Listen");
         this.ListenButton.setOnClickListener(OnClick_listenButton);
-        ViewGroup.LayoutParams LayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams LayoutParams =new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.ListenButton.setLayoutParams(LayoutParams);
         this.AdminView.addView(this.ListenButton);
     }
@@ -196,13 +205,14 @@ public class ConverserActivity extends Activity {
     private void CreateDebugListView()
     {
         this.DebugListView = new ListView(this);
-        ViewGroup.LayoutParams LayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams LayoutParams =new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.DebugListView.setLayoutParams(LayoutParams);
         this.AdminView.addView(this.DebugListView);
         this.DebugOutput = new ArrayList<String>();
         this.DebugArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, this.DebugOutput);
         this.DebugListView.setAdapter(this.DebugArrayAdapter);
     }
+
 
     /////////////////////////////////////
     //callbacks
@@ -304,7 +314,8 @@ public class ConverserActivity extends Activity {
 
     public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
     {
-        CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
+        this.CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
+        this.SpeakFreebaseNodeText(FreebaseNodeData);
     }
 
     @Override
@@ -341,6 +352,11 @@ public class ConverserActivity extends Activity {
         this.ShowAdminView();
     }
 
+    private void OnError_recognitionListener()
+    {
+        this.Listen();
+    }
+
     ///////////////////////////
     //utilities
     ///////////////////////////
@@ -367,7 +383,16 @@ public class ConverserActivity extends Activity {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         //intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+        this.RecognitionListenerExtended.shouldContinuoslyListen = true;
         this.Listener.startListening(intent);
+    }
+
+    private void StopListening()
+    {
+        Log.d("foo", "manual stop of speech reco listening");
+        this.PrintToDebugOutput("manual stop of speech reco listening");
+        this.RecognitionListenerExtended.shouldContinuoslyListen = false;
+        this.Listener.stopListening();
     }
 
     private void Speak(String textToSpeak)
@@ -380,6 +405,8 @@ public class ConverserActivity extends Activity {
 
     private void SayToBot(String textToSpeak)
     {
+        this.StopListening();
+
         final String textToSpeak_ = textToSpeak;
         this.PrintToDebugOutput("saying to pandorabot:  " + textToSpeak);
 
@@ -540,21 +567,24 @@ public class ConverserActivity extends Activity {
 
     class RecognitionListenerExtended implements RecognitionListener
     {
+
+        public boolean shouldContinuoslyListen = false;
+
         public void onReadyForSpeech(Bundle params)
         {
             Log.d("foo", "onReadyForSpeech");
         }
         public void onBeginningOfSpeech()
         {
-            //Log.d(TAG, "onBeginningOfSpeech");
+            Log.d("foo", "onBeginningOfSpeech");
         }
         public void onRmsChanged(float rmsdB)
         {
-            //Log.d(TAG, "onRmsChanged");
+            //Log.d("foo", "onRmsChanged");
         }
         public void onBufferReceived(byte[] buffer)
         {
-            //Log.d(TAG, "onBufferReceived");
+            Log.d("foo", "onBufferReceived");
         }
         public void onEndOfSpeech()
         {
@@ -562,8 +592,11 @@ public class ConverserActivity extends Activity {
         }
         public void onError(int error)
         {
-            //Log.d(TAG,  "error " +  error);
+            Log.d("foo",  "error " +  error);
             //mText.setText("error " + error);
+            PrintToDebugOutput("stopped listening from no audio input");
+
+            if (shouldContinuoslyListen == true) {Listen();}
         }
         public void onResults(Bundle results)
         {
@@ -657,11 +690,12 @@ public class ConverserActivity extends Activity {
                 FreebaseImage FreebaseImage = (FreebaseImage)View;
                 String name = FreebaseImage.FreebaseNodeData.name.toString();
                 PrintToDebugOutput("onTouch freebaseImage:  " + name);
-                ConverserActivity.this.FreebaseInterface.FindFreebaseNodeDataForInputText(name);
-                String text = FreebaseImage.FreebaseNodeData.text;
-                String[] Sentences = text.split("\\.");
-                String firstSentence = Sentences[0];
-                Speak(firstSentence);
+                //ConverserActivity.this.FreebaseInterface.FindFreebaseNodeDataForInputText(name);
+                ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
+                //String text = FreebaseImage.FreebaseNodeData.text;
+                //String[] Sentences = text.split("\\.");
+                //String firstSentence = Sentences[0];
+                //Speak(firstSentence);
                 FadeOutImageView(FreebaseImage);
             }
             return true; //stop the propagation
@@ -687,15 +721,15 @@ public class ConverserActivity extends Activity {
         int rotationY_stop = new Random().nextInt(35) - 17;
 
         ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(ImageView, "translationX", x_start, x_stop);
-        ObjectAnimator_translateX.setDuration(2000);
+        ObjectAnimator_translateX.setDuration(20000);
         ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(ImageView, "translationY", y_start, y_stop);
-        ObjectAnimator_translateY.setDuration(3000);
+        ObjectAnimator_translateY.setDuration(30000);
         ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(ImageView,  "rotation", rotationZ_start, rotationZ_stop);
-        ObjectAnimator_rotateZ.setDuration(2500);
+        ObjectAnimator_rotateZ.setDuration(25000);
         ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(ImageView, "rotationX", rotationX_start, rotationX_stop);
-        ObjectAnimator_rotateX.setDuration(3500);
+        ObjectAnimator_rotateX.setDuration(35000);
         ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(ImageView, "rotationY", rotationY_start, rotationY_stop);
-        ObjectAnimator_rotateY.setDuration(6000);
+        ObjectAnimator_rotateY.setDuration(60000);
 
         ObjectAnimator_rotateY.addListener(AnimatorListener_mediaCanvasImage_animate);
 
@@ -790,10 +824,17 @@ public class ConverserActivity extends Activity {
     {
         int duration  = 500;
         float x_start = this.AdminView.getX();
-        float x_stop = 0 - 100;
+        float x_stop = 0;
         ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(this.AdminView, "x", x_start, x_stop);
         ObjectAnimator_x.setDuration(duration);
         ObjectAnimator_x.start();
     }
 
+    private void SpeakFreebaseNodeText(FreebaseNodeData FreebaseNodeData)
+    {
+        String text = FreebaseNodeData.text;
+        String[] Sentences = text.split("\\.");
+        String firstSentence = Sentences[0];
+        this.Speak(firstSentence);
+    }
 }
