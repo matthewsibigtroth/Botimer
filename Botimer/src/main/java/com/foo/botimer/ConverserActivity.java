@@ -255,8 +255,8 @@ public class ConverserActivity extends Activity {
     private View.OnClickListener OnClick_listenButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Listen();
-            //FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
+            //Listen();
+            FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
             //Speak("this is a test");
         }
     };
@@ -285,7 +285,21 @@ public class ConverserActivity extends Activity {
     {
         Log.d("foo", "heard " + speechRecognized);
         this.PrintToDebugOutput("speech recognizer heard:  " + speechRecognized);
-        this.SayToBot(speechRecognized);
+
+        String hotPhrase = "show me";
+        if (speechRecognized.contains(hotPhrase))
+        {
+            int index_tellMeAbout = speechRecognized.indexOf(hotPhrase);
+            int index_start = index_tellMeAbout + hotPhrase.length();
+            int index_stop = speechRecognized.length();
+            String subString = speechRecognized.substring(index_start, index_stop);
+            this.PrintToDebugOutput("content subString is:  " + subString);
+            this.FreebaseInterface.FindFreebaseNodeDataForInputText(subString);
+        }
+        else
+        {
+            this.SayToBot(speechRecognized);
+        }
     }
 
     public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
