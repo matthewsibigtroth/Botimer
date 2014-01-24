@@ -55,6 +55,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
@@ -76,6 +77,7 @@ public class ConverserActivity extends Activity {
     private ArrayList<String> DebugOutput;
     private ArrayAdapter<String> DebugArrayAdapter;
     private RecognitionListenerExtended RecognitionListenerExtended;
+    private ProgressBar ThinkingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,7 @@ public class ConverserActivity extends Activity {
         this.CreateDebugListView();
         this.CreateListener();
         this.CreateSpeaker();
+        this.CreateThinkingIndicator();
         this.CreateTtsIndicators();
         this.CreateFreebaseInterface();
         this.CreateGestureListener();
@@ -160,6 +163,22 @@ public class ConverserActivity extends Activity {
         TtsIndicator.setScaleX(.3f);
         TtsIndicator.setScaleY(.3f);
         this.TtsIndicators.add(TtsIndicator);
+    }
+
+    private void CreateThinkingIndicator()
+    {
+        this.ThinkingIndicator = new ProgressBar(this, null, android.R.attr.progressBarStyle);
+        RelativeLayout.LayoutParams LayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        LayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        LayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        this.ThinkingIndicator.setLayoutParams(LayoutParams);
+        this.ThinkingIndicator.getLayoutParams().height = 100;
+        this.ThinkingIndicator.getLayoutParams().width = 100;
+        this.ThinkingIndicator.setAlpha(0);
+        RelativeLayout RelativeLayout_container = new RelativeLayout(this);
+        RelativeLayout_container.addView(this.ThinkingIndicator);
+        FrameLayout FrameLayout = (FrameLayout) findViewById(R.id.container);
+        FrameLayout.addView(RelativeLayout_container);
     }
 
     private void CreateFreebaseInterface()
@@ -304,6 +323,7 @@ public class ConverserActivity extends Activity {
             int index_stop = speechRecognized.length();
             String subString = speechRecognized.substring(index_start, index_stop);
             this.PrintToDebugOutput("content subString is:  " + subString);
+            this.ShowThinkingIndicator();
             this.FreebaseInterface.FindFreebaseNodeDataForInputText(subString);
         }
         else
@@ -314,6 +334,7 @@ public class ConverserActivity extends Activity {
 
     public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
     {
+        this.HideThinkingIndicator();
         this.CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
         this.SpeakFreebaseNodeText(FreebaseNodeData);
     }
@@ -408,6 +429,7 @@ public class ConverserActivity extends Activity {
         this.StopListening();
 
         final String textToSpeak_ = textToSpeak;
+        this.ShowThinkingIndicator();
         this.PrintToDebugOutput("saying to pandorabot:  " + textToSpeak);
 
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
@@ -470,6 +492,7 @@ public class ConverserActivity extends Activity {
                 {
                     Log.d("foo", e.getMessage());
                 }
+                HideThinkingIndicator();
                 return null;
             }
 
@@ -594,8 +617,10 @@ public class ConverserActivity extends Activity {
         {
             Log.d("foo",  "error " +  error);
             //mText.setText("error " + error);
-            PrintToDebugOutput("stopped listening from no audio input");
 
+            if (error != 6) {return;}
+
+            PrintToDebugOutput("stopped listening from no audio input");
             if (shouldContinuoslyListen == true) {Listen();}
         }
         public void onResults(Bundle results)
@@ -656,8 +681,9 @@ public class ConverserActivity extends Activity {
                 RelativeLayout.addView(FreebaseImage);
                 FreebaseImage.setX(x);
                 FreebaseImage.setY(y);
-                FreebaseImage.setScaleX(3);
-                FreebaseImage.setScaleY(3);
+                //FreebaseImage.setAlpha(.9f);
+                //FreebaseImage.setScaleX(3);
+                //FreebaseImage.setScaleY(3);
                 //this.ImageViews_playSpace.add(ImageView);
                 //return ImageView;
                 FreebaseImage.setImageBitmap(Bitmap_);
@@ -690,12 +716,8 @@ public class ConverserActivity extends Activity {
                 FreebaseImage FreebaseImage = (FreebaseImage)View;
                 String name = FreebaseImage.FreebaseNodeData.name.toString();
                 PrintToDebugOutput("onTouch freebaseImage:  " + name);
-                //ConverserActivity.this.FreebaseInterface.FindFreebaseNodeDataForInputText(name);
+                ShowThinkingIndicator();
                 ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
-                //String text = FreebaseImage.FreebaseNodeData.text;
-                //String[] Sentences = text.split("\\.");
-                //String firstSentence = Sentences[0];
-                //Speak(firstSentence);
                 FadeOutImageView(FreebaseImage);
             }
             return true; //stop the propagation
@@ -836,5 +858,35 @@ public class ConverserActivity extends Activity {
         String[] Sentences = text.split("\\.");
         String firstSentence = Sentences[0];
         this.Speak(firstSentence);
+    }
+
+    private void ShowThinkingIndicator()
+    {
+        ConverserActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int duration = 500;
+                float alpha_start = ThinkingIndicator.getAlpha();
+                float alpha_stop = 1;
+                ObjectAnimator ObjectAnimator_alpha = ObjectAnimator.ofFloat(ThinkingIndicator, "alpha", alpha_start, alpha_stop);
+                ObjectAnimator_alpha.setDuration(duration);
+                ObjectAnimator_alpha.start();
+            }
+        });
+    }
+
+    private void HideThinkingIndicator()
+    {
+        ConverserActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int duration = 500;
+                float alpha_start = ThinkingIndicator.getAlpha();
+                float alpha_stop = 0;
+                ObjectAnimator ObjectAnimator_alpha = ObjectAnimator.ofFloat(ThinkingIndicator, "alpha", alpha_start, alpha_stop);
+                ObjectAnimator_alpha.setDuration(duration);
+                ObjectAnimator_alpha.start();
+            }
+        });
     }
 }

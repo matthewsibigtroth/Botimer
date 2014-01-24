@@ -108,14 +108,6 @@ public class FreebaseInterface
                     JSONObject TopicDatum = new JSONObject(TopicData.get(index_rand).toString());
                     FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
                     OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
-
-                    //for (int i=0; i<numTopics; i++)
-                    //{
-                    //    JSONObject TopicDatum = new JSONObject(TopicData.get(i).toString());
-                    //    FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
-                    //    OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
-                    //}
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -189,7 +181,10 @@ public class FreebaseInterface
         JSONObject Blob = new org.json.JSONObject(json);
         String id_image = Blob.get("id").toString();
         String url_base_image = "https://usercontent.googleapis.com/freebase/v1/image";
-        String url_image = url_base_image + id_image;
+        int maxwidth = 2000;
+        int maxheight = 1000;
+        String url_params = "?maxwidth=" + String.valueOf(maxwidth) + "&maxheight=" + String.valueOf(maxheight) + "&mode=fillcropmid";
+        String url_image = url_base_image + id_image + url_params;
         this.ConverserActivity.PrintToDebugOutput("found image:  " + url_image);
         return url_image;
     }
