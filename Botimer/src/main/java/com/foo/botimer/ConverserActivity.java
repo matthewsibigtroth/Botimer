@@ -367,16 +367,28 @@ public class ConverserActivity extends Activity {
             float x_stop = x_start + velocityX/2f;
             float y_stop = y_start + velocityY/2f;
 
-            ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(FreebaseImage_beingTouched, "x", x_start, x_stop);
-            ObjectAnimator_x.setDuration(400);
-            ObjectAnimator ObjectAnimator_y = ObjectAnimator.ofFloat(FreebaseImage_beingTouched, "y", y_start, y_stop);
-            ObjectAnimator_y.setDuration(400);
-            ObjectAnimator_y.addListener(AnimatorListener_freebaseImage_fling);
-            AnimatorSet AnimatorSet = new AnimatorSet();
-            AnimatorSet.playTogether(ObjectAnimator_x, ObjectAnimator_y);
-            AnimatorSet.start();
+            Log.d("foo", String.valueOf(Math.sqrt(velocityX*velocityX + velocityY*velocityY) ));
 
-            return false;
+            if (Math.sqrt(velocityX*velocityX + velocityY*velocityY) > 2500)
+            {
+                Log.d("foo", "velocityX:   " + String.valueOf(velocityX));
+                Log.d("foo", "velocityY:   " + String.valueOf(velocityY));
+
+                ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(FreebaseImage_beingTouched, "x", x_start, x_stop);
+                ObjectAnimator_x.setDuration(400);
+                ObjectAnimator ObjectAnimator_y = ObjectAnimator.ofFloat(FreebaseImage_beingTouched, "y", y_start, y_stop);
+                ObjectAnimator_y.setDuration(400);
+                ObjectAnimator_y.addListener(AnimatorListener_freebaseImage_fling);
+                AnimatorSet AnimatorSet = new AnimatorSet();
+                AnimatorSet.playTogether(ObjectAnimator_x, ObjectAnimator_y);
+                AnimatorSet.start();
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         @Override
