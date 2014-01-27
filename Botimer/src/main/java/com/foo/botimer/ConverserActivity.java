@@ -79,7 +79,7 @@ public class ConverserActivity extends Activity {
     private ProgressBar ThinkingIndicator;
     private GestureDetector GestureDetector_freebaseImage;
     private GestureDetector GestureDetector_this;
-    private FreebaseImage FreebaseImage_beingFlung;
+    private FreebaseImage FreebaseImage_beingTouched;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +95,7 @@ public class ConverserActivity extends Activity {
         this.TtsIndicators = new ArrayList<ImageView>();
         this.shouldAnimateTtsIndicators = false;
         this.Random = new Random();
-        this.FreebaseImage_beingFlung = null;
+        this.FreebaseImage_beingTouched = null;
 
         this.CreateAdminView();
         this.CreateListenButton();
@@ -205,7 +205,7 @@ public class ConverserActivity extends Activity {
         this.AdminView.getLayoutParams().width = (int)((float)w_screen*.8f);
         this.AdminView.setOrientation(LinearLayout.VERTICAL);
         this.AdminView.setBackgroundColor(0xFF444444);
-        this.AdminView.setX(-650);
+        this.AdminView.setX(-this.AdminView.getLayoutParams().width);
         this.AdminView.setAlpha(.9f);
         FrameLayout FrameLayout = (FrameLayout) findViewById(R.id.container);
         FrameLayout.addView(this.AdminView);
@@ -359,26 +359,38 @@ public class ConverserActivity extends Activity {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
         {
-            //if (velocityX < 0) { OnFling_freebaseImage(velocityX, veclocityY); }
-            //else { OnFlingRight_this(); }
-            Log.d("foo", String.valueOf(e1.getSource()));
+            Log.d("foo", "onFling_freebaseImage");
+            //Log.d("foo", String.valueOf(e1.getSource()));
 
-            float x_start = FreebaseImage_beingFlung.getX();
-            float y_start = FreebaseImage_beingFlung.getY();
+            float x_start = FreebaseImage_beingTouched.getX();
+            float y_start = FreebaseImage_beingTouched.getY();
             float x_stop = x_start + velocityX/2f;
             float y_stop = y_start + velocityY/2f;
 
-            Log.d("foo", String.valueOf(velocityX));
-            Log.d("foo", String.valueOf(velocityY));
-
-            ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(FreebaseImage_beingFlung, "x", x_start, x_stop);
+            ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(FreebaseImage_beingTouched, "x", x_start, x_stop);
             ObjectAnimator_x.setDuration(400);
-            ObjectAnimator ObjectAnimator_y = ObjectAnimator.ofFloat(FreebaseImage_beingFlung, "y", y_start, y_stop);
+            ObjectAnimator ObjectAnimator_y = ObjectAnimator.ofFloat(FreebaseImage_beingTouched, "y", y_start, y_stop);
             ObjectAnimator_y.setDuration(400);
             ObjectAnimator_y.addListener(AnimatorListener_freebaseImage_fling);
             AnimatorSet AnimatorSet = new AnimatorSet();
             AnimatorSet.playTogether(ObjectAnimator_x, ObjectAnimator_y);
             AnimatorSet.start();
+
+            return false;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent event)
+        {
+
+            Log.d("foo", "onSingleTapConfirmed");
+
+
+            String name = FreebaseImage_beingTouched.FreebaseNodeData.name.toString();
+            PrintToDebugOutput("onTouch freebaseImage:  " + name);
+            ShowThinkingIndicator();
+            ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
+            FadeOutImageView(FreebaseImage_beingTouched);
 
             return false;
         }
@@ -414,7 +426,7 @@ public class ConverserActivity extends Activity {
     {
         @Override
         public boolean onTouch(final View view, final MotionEvent event) {
-            FreebaseImage_beingFlung = (FreebaseImage)view;
+            FreebaseImage_beingTouched = (FreebaseImage)view;
             GestureDetector_freebaseImage.onTouchEvent(event);
             return true;
         }
@@ -910,9 +922,11 @@ public class ConverserActivity extends Activity {
         display.getSize(size);
         int w_screen = size.x;
 
+        LinearLayout.LayoutParams LayoutParams =new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
         int duration  = 500;
         float x_start = this.AdminView.getX();
-        float x_stop = -w_screen;
+        float x_stop = -this.AdminView.getLayoutParams().width;
         ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(this.AdminView, "x", x_start, x_stop);
         ObjectAnimator_x.setDuration(duration);
         ObjectAnimator_x.start();
