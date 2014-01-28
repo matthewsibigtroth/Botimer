@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -295,9 +296,10 @@ public class ConverserActivity extends Activity {
     private View.OnClickListener OnClick_listenButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Listen();
-            FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
+            Listen();
+            //FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
             //Speak("this is a test");
+            //dispatchTakePictureIntent();
         }
     };
 
@@ -453,26 +455,6 @@ public class ConverserActivity extends Activity {
         }
     };
 
-    /*
-    private View.OnTouchListener OnTouchListener_freebaseImage = new View.OnTouchListener()
-    {
-        @Override
-        public boolean onTouch(View View, MotionEvent event)
-        {
-            if (event.getAction() == android.view.MotionEvent.ACTION_UP)
-            {
-                Log.d("foo", "onTouchUp");
-                FreebaseImage FreebaseImage = (FreebaseImage)View;
-                String name = FreebaseImage.FreebaseNodeData.name.toString();
-                PrintToDebugOutput("onTouch freebaseImage:  " + name);
-                ShowThinkingIndicator();
-                ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
-                FadeOutImageView(FreebaseImage);
-            }
-            return true; //stop the propagation
-        }
-    };
-    */
     private Animator.AnimatorListener AnimatorListener_freebaseImage_fling = new Animator.AnimatorListener()
     {
         @Override
@@ -990,5 +972,40 @@ public class ConverserActivity extends Activity {
                 ObjectAnimator_alpha.start();
             }
         });
+    }
+
+    private void dispatchTakePictureIntent()
+    {
+        int REQUEST_IMAGE_CAPTURE = 1;
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null)
+        {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        int REQUEST_IMAGE_CAPTURE = 1;
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
+        {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+
+            ImageView ImageView = new ImageView(ConverserActivity.this);
+            RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
+            int w_layout = RelativeLayout.getWidth();
+            int h_layout = RelativeLayout.getHeight();
+            int x = new Random().nextInt(w_layout);
+            int y = new Random().nextInt(h_layout);
+            ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+            RelativeLayout.addView(ImageView);
+            ImageView.setX(x);
+            ImageView.setY(y);
+            ImageView.setImageBitmap(imageBitmap);
+            AnimateImageView(ImageView);
+        }
     }
 }
