@@ -58,6 +58,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
 
 
@@ -296,13 +298,14 @@ public class ConverserActivity extends Activity {
     private View.OnClickListener OnClick_listenButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Listen();
-            //FreebaseInterface.FindFreebaseNodeDataForInputText("san francisco");
+            //Listen();
+            FreebaseInterface.FindFreebaseNodeDataForInputText("cat");
             //Speak("this is a test");
             //dispatchTakePictureIntent();
         }
     };
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -322,6 +325,7 @@ public class ConverserActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+    */
 
     private void OnSpeechRecognized(String speechRecognized)
     {
@@ -347,6 +351,7 @@ public class ConverserActivity extends Activity {
 
     public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
     {
+        this.PrintToDebugOutput("OnComplete_findFreebaseNodeDataForInputText");
         this.HideThinkingIndicator();
         this.CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
         this.SpeakFreebaseNodeText(FreebaseNodeData);
@@ -529,7 +534,7 @@ public class ConverserActivity extends Activity {
     private void Listen()
     {
         Log.d("foo", "StartListening");
-        this.PrintToDebugOutput("listening...");
+        //this.PrintToDebugOutput("listening...");
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         //intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
@@ -725,7 +730,7 @@ public class ConverserActivity extends Activity {
 
             if (error != 6) {return;}
 
-            PrintToDebugOutput("stopped listening from no audio input");
+            //DebugOutput("stopped listening from no audio input");
             if (shouldContinuoslyListen == true) {Listen();}
         }
         public void onResults(Bundle results)
@@ -739,7 +744,6 @@ public class ConverserActivity extends Activity {
                 str += data.get(i).toString();
                 OnSpeechRecognized(str);
                 return;
-
             }
         }
         public void onPartialResults(Bundle partialResults)
@@ -754,55 +758,83 @@ public class ConverserActivity extends Activity {
 
     private void CreateImageViewFromFreebaseNodeData(FreebaseNodeData FreebaseNodeData)
     {
-        URL Url = null;
-        try {
-            Url = new URL(FreebaseNodeData.url_image);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        Bitmap Bitmap = null;
-        try {
-            Bitmap = BitmapFactory.decodeStream(Url.openConnection().getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        final Bitmap Bitmap_ = Bitmap;
-        final FreebaseNodeData FreebaseNodeData_ = FreebaseNodeData;
-
-
-        ConverserActivity.this.runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                FreebaseImage FreebaseImage = new FreebaseImage(ConverserActivity.this, FreebaseNodeData_);
-                FreebaseImage.setOnTouchListener(OnTouchListener_freebaseImage);
-                RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
-                int w_layout = RelativeLayout.getWidth();
-                int h_layout = RelativeLayout.getHeight();
-                int x = new Random().nextInt(w_layout);
-                int y = new Random().nextInt(h_layout);
-                FreebaseImage.setScaleType(android.widget.ImageView.ScaleType.CENTER);
-                RelativeLayout.addView(FreebaseImage);
-                FreebaseImage.setX(x);
-                FreebaseImage.setY(y);
-                Log.d("foo", "imageview id   " + FreebaseImage.getId());
-                FreebaseImage.setImageBitmap(Bitmap_);
-                AnimateImageView(FreebaseImage);
+        if (FreebaseNodeData.url_image != "")
+        {
+            URL Url = null;
+            try {
+                Url = new URL(FreebaseNodeData.url_image);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
             }
-        });
+
+            Bitmap Bitmap = null;
+            try {
+                Bitmap = BitmapFactory.decodeStream(Url.openConnection().getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            final Bitmap Bitmap_ = Bitmap;
+            final FreebaseNodeData FreebaseNodeData_ = FreebaseNodeData;
+
+
+            ConverserActivity.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    FreebaseImage FreebaseImage = new FreebaseImage(ConverserActivity.this, FreebaseNodeData_);
+                    FreebaseImage.setOnTouchListener(OnTouchListener_freebaseImage);
+                    RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
+                    int w_layout = RelativeLayout.getWidth();
+                    int h_layout = RelativeLayout.getHeight();
+                    int x = new Random().nextInt(w_layout);
+                    int y = new Random().nextInt(h_layout);
+                    FreebaseImage.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+                    RelativeLayout.addView(FreebaseImage);
+                    FreebaseImage.setX(x);
+                    FreebaseImage.setY(y);
+                    Log.d("foo", "imageview id   " + FreebaseImage.getId());
+                    FreebaseImage.setImageBitmap(Bitmap_);
+                    AnimateImageView(FreebaseImage);
+                }
+            });
+        }
+        else
+        {
+
+        }
     }
 
     class FreebaseImage extends ImageView
     {
 
         public FreebaseNodeData FreebaseNodeData;
+        public ImageView ImageView_item;
+        public TextView TextView_name;
 
         public FreebaseImage(Context Context, FreebaseNodeData FreebaseNodeData)
         {
             super(Context);
 
             this.FreebaseNodeData = FreebaseNodeData;
+
+            //this.Init();
+        }
+
+        private void Init()
+        {
+            this.CreateItemImageView();
+            this.CreateNameTextView();
+        }
+
+        private void CreateItemImageView()
+        {
+            this.ImageView_item = new ImageView(getContext());
+        }
+
+        private void CreateNameTextView()
+        {
+            this.TextView_name = new TextView(getContext());
         }
     }
 
@@ -825,15 +857,15 @@ public class ConverserActivity extends Activity {
         int rotationY_stop = new Random().nextInt(35) - 17;
 
         ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(ImageView, "translationX", x_start, x_stop);
-        ObjectAnimator_translateX.setDuration(20000);
+        ObjectAnimator_translateX.setDuration(40000);
         ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(ImageView, "translationY", y_start, y_stop);
-        ObjectAnimator_translateY.setDuration(30000);
+        ObjectAnimator_translateY.setDuration(60000);
         ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(ImageView,  "rotation", rotationZ_start, rotationZ_stop);
-        ObjectAnimator_rotateZ.setDuration(25000);
+        ObjectAnimator_rotateZ.setDuration(50000);
         ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(ImageView, "rotationX", rotationX_start, rotationX_stop);
-        ObjectAnimator_rotateX.setDuration(35000);
+        ObjectAnimator_rotateX.setDuration(70000);
         ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(ImageView, "rotationY", rotationY_start, rotationY_stop);
-        ObjectAnimator_rotateY.setDuration(60000);
+        ObjectAnimator_rotateY.setDuration(120000);
 
         ObjectAnimator_rotateY.addListener(AnimatorListener_mediaCanvasImage_animate);
 
