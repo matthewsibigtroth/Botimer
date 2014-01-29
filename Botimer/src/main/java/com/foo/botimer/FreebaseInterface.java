@@ -262,7 +262,18 @@ public class FreebaseInterface
             JSONObject Common_topic_image = Property.getJSONObject("/common/topic/image");
             JSONArray Values = Common_topic_image.getJSONArray("values");
 
+            int numImages = Values.length();
+            int index_rand = new Random().nextInt(numImages);
+            JSONObject Value = Values.getJSONObject(index_rand);
+            String id_image = Value.get("id").toString();
+            String url_base_image = "https://usercontent.googleapis.com/freebase/v1/image";
+            int maxwidth = 1000;
+            int maxheight = 500;
+            String params = "?maxwidth=" + String.valueOf(maxwidth) + "&maxheight=" + String.valueOf(maxheight) + "&mode=fillcropmid";
+            url_image = url_base_image + id_image + params;
+            this.ConverserActivity.PrintToDebugOutput("found image:  " + url_image);
 
+            /*
             for (int i=0; i<Values.length(); i++)
             {
                 this.ConverserActivity.PrintToDebugOutput("trying image:  " + String.valueOf(i));
@@ -276,6 +287,7 @@ public class FreebaseInterface
                 if (this.DetermineIfImageExists(url_image) == true) {break;}
                 this.ConverserActivity.PrintToDebugOutput("found image:  " + url_image);
             }
+            */
         }
         catch(Exception e)
         {

@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -409,7 +410,7 @@ public class ConverserActivity extends Activity {
             PrintToDebugOutput("onTouch freebaseNodeDisplay:  " + name);
             ShowThinkingIndicator();
             ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
-            FadeOutImageView(FreebaseNodeDisplay_beingTouched);
+            FadeOutFreebaseNodeDisplay(FreebaseNodeDisplay_beingTouched);
 
             return false;
         }
@@ -789,13 +790,14 @@ public class ConverserActivity extends Activity {
                     int h_layout = RelativeLayout.getHeight();
                     int x = new Random().nextInt(w_layout);
                     int y = new Random().nextInt(h_layout);
-                    FreebaseNodeDisplay.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+                    FreebaseNodeDisplay.ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
                     RelativeLayout.addView(FreebaseNodeDisplay);
                     FreebaseNodeDisplay.setX(x);
                     FreebaseNodeDisplay.setY(y);
                     Log.d("foo", "imageview id   " + FreebaseNodeDisplay.getId());
-                    FreebaseNodeDisplay.setImageBitmap(Bitmap_);
-                    AnimateImageView(FreebaseNodeDisplay);
+                    FreebaseNodeDisplay.ImageView.setImageBitmap(Bitmap_);
+                    FreebaseNodeDisplay.TextView.setText(FreebaseNodeData_.name);
+                    AnimateFreebaseNodeDisplay(FreebaseNodeDisplay);
                 }
             });
         }
@@ -805,12 +807,12 @@ public class ConverserActivity extends Activity {
         }
     }
 
-    class FreebaseNodeDisplay extends ImageView
+    class FreebaseNodeDisplay extends LinearLayout
     {
 
         public FreebaseNodeData FreebaseNodeData;
-        public ImageView ImageView_item;
-        public TextView TextView_name;
+        public ImageView ImageView;
+        public TextView TextView;
 
         public FreebaseNodeDisplay(Context Context, FreebaseNodeData FreebaseNodeData)
         {
@@ -818,53 +820,58 @@ public class ConverserActivity extends Activity {
 
             this.FreebaseNodeData = FreebaseNodeData;
 
-            //this.Init();
+            this.Init();
         }
 
         private void Init()
         {
+            this.setOrientation(VERTICAL);
             this.CreateItemImageView();
             this.CreateNameTextView();
         }
 
         private void CreateItemImageView()
         {
-            this.ImageView_item = new ImageView(getContext());
+            this.ImageView = new ImageView(getContext());
+            this.addView(this.ImageView);
         }
 
         private void CreateNameTextView()
         {
-            this.TextView_name = new TextView(getContext());
+            this.TextView = new TextView(getContext());
+            this.TextView.setTextColor(Color.parseColor("#cccccc"));
+            this.TextView.setTextSize(20);
+            this.addView(this.TextView);
         }
     }
 
-    private void AnimateImageView(ImageView ImageView)
+    private void AnimateFreebaseNodeDisplay(FreebaseNodeDisplay FreebaseNodeDisplay)
     {
         RelativeLayout RelativeLayout = (RelativeLayout) this.findViewById(R.id.RelativeLayout_mediaCanvas);
         int w_layout = RelativeLayout.getWidth();
         int h_layout = RelativeLayout.getHeight();
-        int w_imageView = ImageView.getDrawable().getIntrinsicWidth();
-        int h_imageView = ImageView.getDrawable().getIntrinsicHeight();
-        int x_start = (int)ImageView.getX();
-        int y_start = (int)ImageView.getY();
+        int w_imageView = FreebaseNodeDisplay.ImageView.getDrawable().getIntrinsicWidth();
+        int h_imageView = FreebaseNodeDisplay.ImageView.getDrawable().getIntrinsicHeight();
+        int x_start = (int)FreebaseNodeDisplay.ImageView.getX();
+        int y_start = (int)FreebaseNodeDisplay.ImageView.getY();
         int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
         int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
-        int rotationZ_start = (int)ImageView.getRotation();
+        int rotationZ_start = (int)FreebaseNodeDisplay.ImageView.getRotation();
         int rotationZ_stop = new Random().nextInt(35) - 17;
-        int rotationX_start = (int)ImageView.getRotationX();
+        int rotationX_start = (int)FreebaseNodeDisplay.ImageView.getRotationX();
         int rotationX_stop = new Random().nextInt(35) - 17;
-        int rotationY_start = (int)ImageView.getRotationY();
+        int rotationY_start = (int)FreebaseNodeDisplay.ImageView.getRotationY();
         int rotationY_stop = new Random().nextInt(35) - 17;
 
-        ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(ImageView, "translationX", x_start, x_stop);
+        ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "translationX", x_start, x_stop);
         ObjectAnimator_translateX.setDuration(40000);
-        ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(ImageView, "translationY", y_start, y_stop);
+        ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "translationY", y_start, y_stop);
         ObjectAnimator_translateY.setDuration(60000);
-        ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(ImageView,  "rotation", rotationZ_start, rotationZ_stop);
+        ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(FreebaseNodeDisplay,  "rotation", rotationZ_start, rotationZ_stop);
         ObjectAnimator_rotateZ.setDuration(50000);
-        ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(ImageView, "rotationX", rotationX_start, rotationX_stop);
+        ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "rotationX", rotationX_start, rotationX_stop);
         ObjectAnimator_rotateX.setDuration(70000);
-        ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(ImageView, "rotationY", rotationY_start, rotationY_stop);
+        ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "rotationY", rotationY_start, rotationY_stop);
         ObjectAnimator_rotateY.setDuration(120000);
 
         ObjectAnimator_rotateY.addListener(AnimatorListener_mediaCanvasImage_animate);
@@ -884,8 +891,8 @@ public class ConverserActivity extends Activity {
         @Override
         public void onAnimationEnd(Animator Animator)
         {
-            ImageView ImageView = (ImageView) ((ObjectAnimator) Animator).getTarget();
-            AnimateImageView(ImageView);
+            FreebaseNodeDisplay FreebaseNodeDisplay = (FreebaseNodeDisplay) ((ObjectAnimator) Animator).getTarget();
+            AnimateFreebaseNodeDisplay(FreebaseNodeDisplay);
         }
 
         @Override
@@ -899,12 +906,12 @@ public class ConverserActivity extends Activity {
         }
     };
 
-    private void FadeOutImageView(ImageView ImageView)
+    private void FadeOutFreebaseNodeDisplay(FreebaseNodeDisplay FreebaseNodeDisplay)
     {
-        float alpha_start = (int)ImageView.getAlpha();
+        float alpha_start = (int)FreebaseNodeDisplay.getAlpha();
         float alpha_stop = 0;
 
-        ObjectAnimator ObjectAnimator_alpha = ObjectAnimator.ofFloat(ImageView, "alpha", alpha_start, alpha_stop);
+        ObjectAnimator ObjectAnimator_alpha = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "alpha", alpha_start, alpha_stop);
         ObjectAnimator_alpha.setDuration(5000);
 
         ObjectAnimator_alpha.addListener(AnimatorListener_mediaCanvasImage_fadeOut);
@@ -924,9 +931,9 @@ public class ConverserActivity extends Activity {
         @Override
         public void onAnimationEnd(Animator Animator)
         {
-            ImageView ImageView = (ImageView) ((ObjectAnimator) Animator).getTarget();
+            FreebaseNodeDisplay FreebaseNodeDisplay = (FreebaseNodeDisplay) ((ObjectAnimator) Animator).getTarget();
             RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
-            RelativeLayout.removeView(ImageView);
+            RelativeLayout.removeView(FreebaseNodeDisplay);
         }
 
         @Override
@@ -1037,7 +1044,7 @@ public class ConverserActivity extends Activity {
             ImageView.setX(x);
             ImageView.setY(y);
             ImageView.setImageBitmap(imageBitmap);
-            AnimateImageView(ImageView);
+            //AnimateImageView(ImageView);
         }
     }
 }
