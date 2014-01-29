@@ -34,6 +34,8 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.content.Intent;
 import android.view.Window;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 
@@ -354,7 +356,7 @@ public class ConverserActivity extends Activity {
     {
         this.PrintToDebugOutput("OnComplete_findFreebaseNodeDataForInputText");
         this.HideThinkingIndicator();
-        this.CreateImageViewFromFreebaseNodeData(FreebaseNodeData);
+        this.CreateFreebaseNodeDisplayFromFreebaseNodeData(FreebaseNodeData);
         this.SpeakFreebaseNodeText(FreebaseNodeData);
     }
 
@@ -410,7 +412,7 @@ public class ConverserActivity extends Activity {
             PrintToDebugOutput("onTouch freebaseNodeDisplay:  " + name);
             ShowThinkingIndicator();
             ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
-            FadeOutFreebaseNodeDisplay(FreebaseNodeDisplay_beingTouched);
+            //FadeOutFreebaseNodeDisplay(FreebaseNodeDisplay_beingTouched);
 
             return false;
         }
@@ -757,7 +759,7 @@ public class ConverserActivity extends Activity {
         }
     }
 
-    private void CreateImageViewFromFreebaseNodeData(FreebaseNodeData FreebaseNodeData)
+    private void CreateFreebaseNodeDisplayFromFreebaseNodeData(FreebaseNodeData FreebaseNodeData)
     {
         if (FreebaseNodeData.url_image != "")
         {
@@ -790,20 +792,49 @@ public class ConverserActivity extends Activity {
                     int h_layout = RelativeLayout.getHeight();
                     int x = new Random().nextInt(w_layout);
                     int y = new Random().nextInt(h_layout);
+                    PrintToDebugOutput("w_layout:   " + String.valueOf(w_layout));
+                    PrintToDebugOutput("h_layout:   " + String.valueOf(h_layout));
+                    PrintToDebugOutput("x_layout:   " + String.valueOf(x));
+                    PrintToDebugOutput("y_layout:   " + String.valueOf(y));
                     FreebaseNodeDisplay.ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
                     RelativeLayout.addView(FreebaseNodeDisplay);
                     FreebaseNodeDisplay.setX(x);
                     FreebaseNodeDisplay.setY(y);
+
                     Log.d("foo", "imageview id   " + FreebaseNodeDisplay.getId());
                     FreebaseNodeDisplay.ImageView.setImageBitmap(Bitmap_);
                     FreebaseNodeDisplay.TextView.setText(FreebaseNodeData_.name);
                     AnimateFreebaseNodeDisplay(FreebaseNodeDisplay);
+
+                    float scaleX_start = .01f;
+                    float scaleX_stop = 1f;
+                    float scaleY_start = .01f;
+                    float scaleY_stop = 1f;
+
+                    FreebaseNodeDisplay.setScaleX(scaleX_start);
+                    FreebaseNodeDisplay.setScaleY(scaleY_start);
+                    ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "scaleX", scaleX_start, scaleX_stop);
+                    ObjectAnimator_scaleX.setDuration(300);
+                    ObjectAnimator_scaleX.setStartDelay(250);
+                    ObjectAnimator_scaleX.setInterpolator(new DecelerateInterpolator());
+                    ObjectAnimator_scaleX.start();
+
+                    ObjectAnimator ObjectAnimator_scaleY = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "scaleY", scaleY_start, scaleY_stop);
+                    ObjectAnimator_scaleY.setDuration(200);
+                    ObjectAnimator_scaleY.start();
+
+
+                    //AnimatorSet AnimatorSet = new AnimatorSet();
+                    //AnimatorSet.playTogether(ObjectAnimator_scaleX);
+                    //AnimatorSet.start();
+
+
                 }
             });
         }
         else
         {
-
+            this.PrintToDebugOutput("url_image was empty");
         }
     }
 
@@ -852,15 +883,16 @@ public class ConverserActivity extends Activity {
         int h_layout = RelativeLayout.getHeight();
         int w_imageView = FreebaseNodeDisplay.ImageView.getDrawable().getIntrinsicWidth();
         int h_imageView = FreebaseNodeDisplay.ImageView.getDrawable().getIntrinsicHeight();
-        int x_start = (int)FreebaseNodeDisplay.ImageView.getX();
-        int y_start = (int)FreebaseNodeDisplay.ImageView.getY();
+        int x_start = (int)FreebaseNodeDisplay.getX();
+        int y_start = (int)FreebaseNodeDisplay.getY();
+        this.PrintToDebugOutput("x_start:   " + String.valueOf(x_start));
         int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
         int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
-        int rotationZ_start = (int)FreebaseNodeDisplay.ImageView.getRotation();
+        int rotationZ_start = (int)FreebaseNodeDisplay.getRotation();
         int rotationZ_stop = new Random().nextInt(35) - 17;
-        int rotationX_start = (int)FreebaseNodeDisplay.ImageView.getRotationX();
+        int rotationX_start = (int)FreebaseNodeDisplay.getRotationX();
         int rotationX_stop = new Random().nextInt(35) - 17;
-        int rotationY_start = (int)FreebaseNodeDisplay.ImageView.getRotationY();
+        int rotationY_start = (int)FreebaseNodeDisplay.getRotationY();
         int rotationY_stop = new Random().nextInt(35) - 17;
 
         ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "translationX", x_start, x_stop);
