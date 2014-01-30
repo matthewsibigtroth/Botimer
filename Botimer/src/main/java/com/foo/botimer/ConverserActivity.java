@@ -301,8 +301,8 @@ public class ConverserActivity extends Activity {
     private View.OnClickListener OnClick_listenButton = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Listen();
-            FreebaseInterface.FindFreebaseNodeDataForInputText("cat");
+            Listen();
+            //FreebaseInterface.FindFreebaseNodeDataForInputText("jkaweouhawpeihaeo");
             //Speak("this is a test");
             //dispatchTakePictureIntent();
         }
@@ -352,17 +352,23 @@ public class ConverserActivity extends Activity {
         }
     }
 
-    public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
+    public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData, String inputText)
     {
-        this.PrintToDebugOutput("OnComplete_findFreebaseNodeDataForInputText");
-        this.HideThinkingIndicator();
-        this.CreateFreebaseNodeDisplayFromFreebaseNodeData(FreebaseNodeData);
-        this.SpeakFreebaseNodeText(FreebaseNodeData);
+        if (FreebaseNodeData != null)
+        {
+            this.PrintToDebugOutput("OnComplete_findFreebaseNodeDataForInputText:  found data!");
+            this.HideThinkingIndicator();
+            this.CreateFreebaseNodeDisplayFromFreebaseNodeData(FreebaseNodeData);
+            this.SpeakFreebaseNodeText(FreebaseNodeData);
+        }
+        else
+        {
+            this.PrintToDebugOutput("OnComplete_findFreebaseNodeDataForInputText:  no data found");
+            this.HideThinkingIndicator();
+            this.SayToBot("Show me " + inputText);
+            //this.SayToBot("What do you know about " + inputText);
+        }
     }
-
-
-
-
 
     private class GestureListener_freebaseNodeDisplay extends GestureDetector.SimpleOnGestureListener
     {
@@ -404,10 +410,7 @@ public class ConverserActivity extends Activity {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent event)
         {
-
             Log.d("foo", "onSingleTapConfirmed");
-
-
             String name = FreebaseNodeDisplay_beingTouched.FreebaseNodeData.name.toString();
             PrintToDebugOutput("onTouch freebaseNodeDisplay:  " + name);
             ShowThinkingIndicator();
@@ -548,10 +551,15 @@ public class ConverserActivity extends Activity {
 
     private void StopListening()
     {
-        Log.d("foo", "manual stop of speech reco listening");
-        this.PrintToDebugOutput("manual stop of speech reco listening");
-        this.RecognitionListenerExtended.shouldContinuoslyListen = false;
-        this.Listener.stopListening();
+        ConverserActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("foo", "manual stop of speech reco listening");
+                PrintToDebugOutput("manual stop of speech reco listening");
+                RecognitionListenerExtended.shouldContinuoslyListen = false;
+                Listener.stopListening();
+            }
+        });
     }
 
     private void Speak(String textToSpeak)
@@ -813,6 +821,7 @@ public class ConverserActivity extends Activity {
 
                     FreebaseNodeDisplay.setScaleX(scaleX_start);
                     FreebaseNodeDisplay.setScaleY(scaleY_start);
+
                     ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "scaleX", scaleX_start, scaleX_stop);
                     ObjectAnimator_scaleX.setDuration(300);
                     ObjectAnimator_scaleX.setStartDelay(250);
@@ -823,12 +832,9 @@ public class ConverserActivity extends Activity {
                     ObjectAnimator_scaleY.setDuration(200);
                     ObjectAnimator_scaleY.start();
 
-
                     //AnimatorSet AnimatorSet = new AnimatorSet();
                     //AnimatorSet.playTogether(ObjectAnimator_scaleX);
                     //AnimatorSet.start();
-
-
                 }
             });
         }

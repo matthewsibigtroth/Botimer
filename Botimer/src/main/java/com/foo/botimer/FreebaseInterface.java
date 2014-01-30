@@ -69,9 +69,9 @@ public class FreebaseInterface
     /////////////////////////////////////
 
 
-    private void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData)
+    private void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData, String inputText)
     {
-        this.ConverserActivity.OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
+        this.ConverserActivity.OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData, inputText);
     }
 
 
@@ -98,9 +98,18 @@ public class FreebaseInterface
                 try
                 {
                     JSONArray TopicData = FindTopicDataForInputText(inputText__);
-                    JSONObject TopicDatum = new JSONObject(TopicData.get(0).toString());
-                    FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
-                    OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
+
+                    if (TopicData.length() == 0)
+                    {
+                        OnComplete_findFreebaseNodeDataForInputText(null, inputText__);
+                    }
+                    else
+                    {
+                        JSONObject TopicDatum = new JSONObject(TopicData.get(0).toString());
+                        FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
+                        OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData, inputText__);
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -136,7 +145,7 @@ public class FreebaseInterface
                     ConverserActivity.PrintToDebugOutput(" _ ");
                     //JSONObject TopicDatum = new JSONObject(TopicData.get(1).toString());
                     FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
-                    OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData);
+                    OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData, inputText__);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
