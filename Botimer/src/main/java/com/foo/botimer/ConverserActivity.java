@@ -64,6 +64,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
+import android.media.MediaPlayer;
 
 
 public class ConverserActivity extends Activity {
@@ -86,6 +87,7 @@ public class ConverserActivity extends Activity {
     private GestureDetector GestureDetector_freebaseNodeDisplay;
     private GestureDetector GestureDetector_this;
     private FreebaseNodeDisplay FreebaseNodeDisplay_beingTouched;
+    private MediaPlayer MediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -249,6 +251,39 @@ public class ConverserActivity extends Activity {
         findViewById(R.id.container).setOnTouchListener(this.OnTouchListener_this);
     }
 
+    private void PlaySound(Uri Uri, int delay) throws IOException
+    {
+        final Uri Uri_ = Uri;
+        final int delay_ = delay;
+        Runnable runnable = new Runnable()
+        {
+            public void run()
+            {
+                try {
+                    Thread.sleep(delay_);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                MediaPlayer = new MediaPlayer();
+                MediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                try {
+                    //MediaPlayer.setDataSource(getApplicationContext(), Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.whip));
+                    MediaPlayer.setDataSource(getApplicationContext(), Uri_);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    MediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                MediaPlayer.start();
+            }
+        };
+        Thread mythread = new Thread(runnable);
+        mythread.start();
+    }
+
 
     /////////////////////////////////////
     //callbacks
@@ -302,33 +337,12 @@ public class ConverserActivity extends Activity {
         @Override
         public void onClick(View view) {
             Listen();
-            //FreebaseInterface.FindFreebaseNodeDataForInputText("jkaweouhawpeihaeo");
+            //FreebaseInterface.FindFreebaseNodeDataForInputText("cat");
             //Speak("this is a test");
             //dispatchTakePictureIntent();
         }
     };
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.converser, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    */
 
     private void OnSpeechRecognized(String speechRecognized)
     {
@@ -377,6 +391,14 @@ public class ConverserActivity extends Activity {
         {
             Log.d("foo", "onFling_freebaseNodeDisplay");
             //Log.d("foo", String.valueOf(e1.getSource()));
+
+            try
+            {
+                Uri Uri_ = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.whip);
+                PlaySound(Uri_, 0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             float x_start = FreebaseNodeDisplay_beingTouched.getX();
             float y_start = FreebaseNodeDisplay_beingTouched.getY();
@@ -540,7 +562,7 @@ public class ConverserActivity extends Activity {
     private void Listen()
     {
         Log.d("foo", "StartListening");
-        //this.PrintToDebugOutput("listening...");
+        this.PrintToDebugOutput("listening...");
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         //intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
@@ -645,7 +667,6 @@ public class ConverserActivity extends Activity {
             @Override
             protected void onPostExecute(Void result) {
                 //Show UI (Toast msg here)
-
             }
 
         };
@@ -741,7 +762,7 @@ public class ConverserActivity extends Activity {
 
             if (error != 6) {return;}
 
-            //DebugOutput("stopped listening from no audio input");
+            ConverserActivity.this.PrintToDebugOutput("stopped listening from no audio input");
             if (shouldContinuoslyListen == true) {Listen();}
         }
         public void onResults(Bundle results)
@@ -771,6 +792,14 @@ public class ConverserActivity extends Activity {
     {
         if (FreebaseNodeData.url_image != "")
         {
+            try
+            {
+                Uri Uri_ = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.space_gun);
+                PlaySound(Uri_, 1000);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             URL Url = null;
             try {
                 Url = new URL(FreebaseNodeData.url_image);
@@ -798,12 +827,13 @@ public class ConverserActivity extends Activity {
                     RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
                     int w_layout = RelativeLayout.getWidth();
                     int h_layout = RelativeLayout.getHeight();
-                    int x = new Random().nextInt(w_layout);
-                    int y = new Random().nextInt(h_layout);
-                    PrintToDebugOutput("w_layout:   " + String.valueOf(w_layout));
-                    PrintToDebugOutput("h_layout:   " + String.valueOf(h_layout));
-                    PrintToDebugOutput("x_layout:   " + String.valueOf(x));
-                    PrintToDebugOutput("y_layout:   " + String.valueOf(y));
+                    int padding = 200;
+                    int x_min = padding;
+                    int x_max = w_layout - padding;
+                    int y_min = padding;
+                    int y_max = h_layout - padding;
+                    int x = new Random().nextInt(x_max - x_min + 1) + x_min;
+                    int y = new Random().nextInt(y_max - y_min + 1) + y_min;
                     FreebaseNodeDisplay.ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
                     RelativeLayout.addView(FreebaseNodeDisplay);
                     FreebaseNodeDisplay.setX(x);
@@ -891,7 +921,6 @@ public class ConverserActivity extends Activity {
         int h_imageView = FreebaseNodeDisplay.ImageView.getDrawable().getIntrinsicHeight();
         int x_start = (int)FreebaseNodeDisplay.getX();
         int y_start = (int)FreebaseNodeDisplay.getY();
-        this.PrintToDebugOutput("x_start:   " + String.valueOf(x_start));
         int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
         int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
         int rotationZ_start = (int)FreebaseNodeDisplay.getRotation();
