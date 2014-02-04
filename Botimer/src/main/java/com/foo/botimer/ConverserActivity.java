@@ -822,6 +822,7 @@ public class ConverserActivity extends Activity {
 
                 @Override
                 public void run() {
+
                     FreebaseNodeDisplay FreebaseNodeDisplay = new FreebaseNodeDisplay(ConverserActivity.this, FreebaseNodeData_);
                     FreebaseNodeDisplay.setOnTouchListener(OnTouchListener_freebaseNodeDisplay);
                     RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
