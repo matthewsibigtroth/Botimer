@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Botimer/Botimer.iml" filepath="$PROJECT_DIR$/Botimer/Botimer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Botimer/Botimer-Botimer.iml" filepath="$PROJECT_DIR$/Botimer/Botimer-Botimer.iml" />
       <module fileurl="file://$PROJECT_DIR$/BotimerProject.iml" filepath="$PROJECT_DIR$/BotimerProject.iml" />
     </modules>
   </component>

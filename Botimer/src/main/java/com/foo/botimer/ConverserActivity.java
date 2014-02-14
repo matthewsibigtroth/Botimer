@@ -122,9 +122,6 @@ public class ConverserActivity extends Activity {
         this.Listener = SpeechRecognizer.createSpeechRecognizer(this);
         this.RecognitionListenerExtended = new RecognitionListenerExtended();
         this.Listener.setRecognitionListener(this.RecognitionListenerExtended);
-        //disable speechrecognizer beep
-        AudioManager AudioManager = (AudioManager) getSystemService(this.AUDIO_SERVICE);
-        AudioManager.setStreamMute(AudioManager.VIBRATE_TYPE_NOTIFICATION, true);
         this.Listen();
     }
 
@@ -259,6 +256,8 @@ public class ConverserActivity extends Activity {
         {
             public void run()
             {
+                //UnMuteSystemStream();
+
                 try {
                     Thread.sleep(delay_);
                 } catch (InterruptedException e) {
@@ -327,6 +326,7 @@ public class ConverserActivity extends Activity {
             ConverserActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    //UnMuteSystemStream();
                     StartAnimatingTtsIndicators();
                 }
             });
@@ -435,6 +435,30 @@ public class ConverserActivity extends Activity {
             Log.d("foo", "onSingleTapConfirmed");
             String name = FreebaseNodeDisplay_beingTouched.FreebaseNodeData.name.toString();
             PrintToDebugOutput("onTouch freebaseNodeDisplay:  " + name);
+            try
+            {
+                Uri Uri_ = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.beep_2);
+                PlaySound(Uri_, 0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            float scaleX_start = .9f;
+            float scaleX_stop = 1f;
+            float scaleY_start = .9f;
+            float scaleY_stop = 1f;
+
+            ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(FreebaseNodeDisplay_beingTouched, "scaleX", scaleX_start, scaleX_stop);
+            ObjectAnimator_scaleX.setDuration(200);
+            //ObjectAnimator_scaleX.setInterpolator(new DecelerateInterpolator());
+            ObjectAnimator_scaleX.start();
+
+            ObjectAnimator ObjectAnimator_scaleY = ObjectAnimator.ofFloat(FreebaseNodeDisplay_beingTouched, "scaleY", scaleY_start, scaleY_stop);
+            ObjectAnimator_scaleY.setDuration(200);
+            //ObjectAnimator_scaleX.setInterpolator(new DecelerateInterpolator());
+            ObjectAnimator_scaleY.start();
+
+
             ShowThinkingIndicator();
             ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
             //FadeOutFreebaseNodeDisplay(FreebaseNodeDisplay_beingTouched);
@@ -563,12 +587,26 @@ public class ConverserActivity extends Activity {
     {
         Log.d("foo", "StartListening");
         this.PrintToDebugOutput("listening...");
+
+        //this.MuteSystemStream();
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         //intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
         this.RecognitionListenerExtended.shouldContinuoslyListen = true;
         this.Listener.startListening(intent);
+    }
+
+    private void MuteSystemStream()
+    {
+        AudioManager AudioManager = (AudioManager) getSystemService(this.AUDIO_SERVICE);
+        AudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
+    }
+
+    private void UnMuteSystemStream()
+    {
+        AudioManager AudioManager = (AudioManager) getSystemService(this.AUDIO_SERVICE);
+        AudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 5, AudioManager.FLAG_PLAY_SOUND);
     }
 
     private void StopListening()
@@ -738,6 +776,7 @@ public class ConverserActivity extends Activity {
         public void onReadyForSpeech(Bundle params)
         {
             Log.d("foo", "onReadyForSpeech");
+            //MuteSystemStream();
         }
         public void onBeginningOfSpeech()
         {
@@ -760,7 +799,7 @@ public class ConverserActivity extends Activity {
             Log.d("foo",  "error " +  error);
             //mText.setText("error " + error);
 
-            if (error != 6) {return;}
+            if ((error != 6) && (error!=7) && (error!=5)) {return;}
 
             ConverserActivity.this.PrintToDebugOutput("stopped listening from no audio input");
             if (shouldContinuoslyListen == true) {Listen();}
