@@ -4,47 +4,32 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
-
 import android.speech.tts.TextToSpeech;
-
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.content.Intent;
 import android.view.Window;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-
 import java.net.URL;
 import java.io.OutputStreamWriter;
 import java.io.BufferedReader;
@@ -53,7 +38,6 @@ import android.net.Uri;
 import android.speech.tts.UtteranceProgressListener;
 import java.util.HashMap;
 import java.util.Random;
-
 import android.media.AudioManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -61,22 +45,19 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
 import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
 import android.media.MediaPlayer;
 
 
 public class ConverserActivity extends Activity {
 
-    private SpeechRecognizer Listener;
+    public  SpeechRecognizer Listener;
     private TextToSpeech Speaker;
     private HashMap<String, String> TtsUtteranceMap;
     private ArrayList<ImageView> TtsIndicators;
     private boolean shouldAnimateTtsIndicators;
-    private FreebaseInterface FreebaseInterface;
+    private FreebaseInterface freebaseInterface;
     private Random Random;
-    private GestureDetectorCompat GestureDetectorCompat;
     private LinearLayout AdminView;
     private Button ListenButton;
     private ListView DebugListView;
@@ -84,13 +65,13 @@ public class ConverserActivity extends Activity {
     private ArrayAdapter<String> DebugArrayAdapter;
     private RecognitionListenerExtended RecognitionListenerExtended;
     private ProgressBar ThinkingIndicator;
-    private GestureDetector GestureDetector_freebaseNodeDisplay;
     private GestureDetector GestureDetector_this;
-    private FreebaseNodeDisplay FreebaseNodeDisplay_beingTouched;
+    private FreebaseNodeDisplay freebaseNodeDisplay_beingTouched;
     private MediaPlayer MediaPlayer;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_converser);
@@ -103,7 +84,7 @@ public class ConverserActivity extends Activity {
         this.TtsIndicators = new ArrayList<ImageView>();
         this.shouldAnimateTtsIndicators = false;
         this.Random = new Random();
-        this.FreebaseNodeDisplay_beingTouched = null;
+        this.freebaseNodeDisplay_beingTouched = null;
 
         this.CreateAdminView();
         this.CreateListenButton();
@@ -113,7 +94,6 @@ public class ConverserActivity extends Activity {
         this.CreateThinkingIndicator();
         this.CreateTtsIndicators();
         this.CreateFreebaseInterface();
-        this.CreateFreebaseNodeDisplayGestureDetector();
         this.CreateThisGestureDetector();
     }
 
@@ -192,7 +172,7 @@ public class ConverserActivity extends Activity {
 
     private void CreateFreebaseInterface()
     {
-        this.FreebaseInterface = new FreebaseInterface(this);
+        this.freebaseInterface = new FreebaseInterface(this);
     }
 
 
@@ -235,11 +215,6 @@ public class ConverserActivity extends Activity {
         this.DebugOutput = new ArrayList<String>();
         this.DebugArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, this.DebugOutput);
         this.DebugListView.setAdapter(this.DebugArrayAdapter);
-    }
-
-    private void CreateFreebaseNodeDisplayGestureDetector()
-    {
-        this.GestureDetector_freebaseNodeDisplay = new GestureDetector(new GestureListener_freebaseNodeDisplay());
     }
 
     private void CreateThisGestureDetector()
@@ -358,7 +333,7 @@ public class ConverserActivity extends Activity {
             String subString = speechRecognized.substring(index_start, index_stop);
             this.PrintToDebugOutput("content subString is:  " + subString);
             this.ShowThinkingIndicator();
-            this.FreebaseInterface.FindFreebaseNodeDataForInputText(subString);
+            this.freebaseInterface.FindFreebaseNodeDataForInputText(subString);
         }
         else
         {
@@ -366,14 +341,14 @@ public class ConverserActivity extends Activity {
         }
     }
 
-    public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData FreebaseNodeData, String inputText)
+    public void OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData freebaseNodeData, String inputText)
     {
-        if (FreebaseNodeData != null)
+        if (freebaseNodeData != null)
         {
             this.PrintToDebugOutput("OnComplete_findFreebaseNodeDataForInputText:  found data!");
             this.HideThinkingIndicator();
-            this.CreateFreebaseNodeDisplayFromFreebaseNodeData(FreebaseNodeData);
-            this.SpeakFreebaseNodeText(FreebaseNodeData);
+            this.CreateFreebaseNodeDisplayFromFreebaseNodeData(freebaseNodeData);
+            this.SpeakFreebaseNodeText(freebaseNodeData);
         }
         else
         {
@@ -384,88 +359,6 @@ public class ConverserActivity extends Activity {
         }
     }
 
-    private class GestureListener_freebaseNodeDisplay extends GestureDetector.SimpleOnGestureListener
-    {
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
-        {
-            Log.d("foo", "onFling_freebaseNodeDisplay");
-            //Log.d("foo", String.valueOf(e1.getSource()));
-
-            try
-            {
-                Uri Uri_ = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.whip);
-                PlaySound(Uri_, 0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            float x_start = FreebaseNodeDisplay_beingTouched.getX();
-            float y_start = FreebaseNodeDisplay_beingTouched.getY();
-            float x_stop = x_start + velocityX/2f;
-            float y_stop = y_start + velocityY/2f;
-
-            Log.d("foo", String.valueOf(Math.sqrt(velocityX*velocityX + velocityY*velocityY) ));
-
-            if (Math.sqrt(velocityX*velocityX + velocityY*velocityY) > 2500)
-            {
-                Log.d("foo", "velocityX:   " + String.valueOf(velocityX));
-                Log.d("foo", "velocityY:   " + String.valueOf(velocityY));
-
-                ObjectAnimator ObjectAnimator_x = ObjectAnimator.ofFloat(FreebaseNodeDisplay_beingTouched, "x", x_start, x_stop);
-                ObjectAnimator_x.setDuration(400);
-                ObjectAnimator ObjectAnimator_y = ObjectAnimator.ofFloat(FreebaseNodeDisplay_beingTouched, "y", y_start, y_stop);
-                ObjectAnimator_y.setDuration(400);
-                ObjectAnimator_y.addListener(AnimatorListener_freebaseNodeDisplay_fling);
-                AnimatorSet AnimatorSet = new AnimatorSet();
-                AnimatorSet.playTogether(ObjectAnimator_x, ObjectAnimator_y);
-                AnimatorSet.start();
-
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent event)
-        {
-            Log.d("foo", "onSingleTapConfirmed");
-            String name = FreebaseNodeDisplay_beingTouched.FreebaseNodeData.name.toString();
-            PrintToDebugOutput("onTouch freebaseNodeDisplay:  " + name);
-            try
-            {
-                Uri Uri_ = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.beep_2);
-                PlaySound(Uri_, 0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            float scaleX_start = .9f;
-            float scaleX_stop = 1f;
-            float scaleY_start = .9f;
-            float scaleY_stop = 1f;
-
-            ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(FreebaseNodeDisplay_beingTouched, "scaleX", scaleX_start, scaleX_stop);
-            ObjectAnimator_scaleX.setDuration(200);
-            //ObjectAnimator_scaleX.setInterpolator(new DecelerateInterpolator());
-            ObjectAnimator_scaleX.start();
-
-            ObjectAnimator ObjectAnimator_scaleY = ObjectAnimator.ofFloat(FreebaseNodeDisplay_beingTouched, "scaleY", scaleY_start, scaleY_stop);
-            ObjectAnimator_scaleY.setDuration(200);
-            //ObjectAnimator_scaleX.setInterpolator(new DecelerateInterpolator());
-            ObjectAnimator_scaleY.start();
-
-
-            ShowThinkingIndicator();
-            ConverserActivity.this.FreebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
-            //FadeOutFreebaseNodeDisplay(FreebaseNodeDisplay_beingTouched);
-
-            return false;
-        }
-    }
 
     private class GestureListener_this extends GestureDetector.SimpleOnGestureListener
     {
@@ -493,15 +386,7 @@ public class ConverserActivity extends Activity {
         this.Listen();
     }
 
-    private View.OnTouchListener OnTouchListener_freebaseNodeDisplay = new View.OnTouchListener()
-    {
-        @Override
-        public boolean onTouch(final View view, final MotionEvent event) {
-            FreebaseNodeDisplay_beingTouched = (FreebaseNodeDisplay)view;
-            GestureDetector_freebaseNodeDisplay.onTouchEvent(event);
-            return true;
-        }
-    };
+
 
     private View.OnTouchListener OnTouchListener_this = new View.OnTouchListener()
     {
@@ -512,34 +397,7 @@ public class ConverserActivity extends Activity {
         }
     };
 
-    private Animator.AnimatorListener AnimatorListener_freebaseNodeDisplay_fling = new Animator.AnimatorListener()
-    {
-        @Override
-        public void onAnimationCancel(Animator arg0)
-        {
-        }
 
-        @Override
-        public void onAnimationEnd(Animator Animator)
-        {
-            //ImageView TtsIndicator = (ImageView) ((ObjectAnimator) Animator).getTarget();
-            //ScaleDownTtsIndicator(TtsIndicator);
-
-            FreebaseNodeDisplay FreebaseNodeDisplay = (FreebaseNodeDisplay) ((ObjectAnimator) Animator).getTarget();
-            RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
-            RelativeLayout.removeView(FreebaseNodeDisplay);
-        }
-
-        @Override
-        public void onAnimationRepeat(Animator arg0)
-        {
-        }
-
-        @Override
-        public void onAnimationStart(Animator arg0)
-        {
-        }
-    };
 
     private Animator.AnimatorListener AnimatorListener_ttsIndicator_scaleUp = new Animator.AnimatorListener()
     {
@@ -565,6 +423,43 @@ public class ConverserActivity extends Activity {
         {
         }
     };
+
+    public void OnSingleTap_freebaseNodeDisplay(FreebaseNodeDisplay freebaseNodeDisplay)
+    {
+        ShowThinkingIndicator();
+
+        try
+        {
+            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.beep_2);
+            PlaySound(uri, 0);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+
+        String name = freebaseNodeDisplay.FreebaseNodeData.name.toString();
+        //this.PrintToDebugOutput("onTouch freebaseNodeDisplay:  " + name);
+        this.freebaseInterface.FindRelatedFreebaseNodeDataForInputText(name);
+    }
+
+    public void OnFling_freebaseNodeDisplay(FreebaseNodeDisplay freebaseNodeDisplay)
+    {
+        try
+        {
+            Uri uri = Uri.parse("android.resource://" + this.getPackageName() + "/" + R.raw.whip);
+            this.PlaySound(uri, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void OnFlingComplete_freebaseNodeDisplay(FreebaseNodeDisplay freebaseNodeDisplay)
+    {
+        RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
+        RelativeLayout.removeView(freebaseNodeDisplay);
+    }
+
 
     ///////////////////////////
     //utilities
@@ -827,9 +722,9 @@ public class ConverserActivity extends Activity {
         }
     }
 
-    private void CreateFreebaseNodeDisplayFromFreebaseNodeData(FreebaseNodeData FreebaseNodeData)
+    private void CreateFreebaseNodeDisplayFromFreebaseNodeData(FreebaseNodeData freebaseNodeData)
     {
-        if (FreebaseNodeData.url_image != "")
+        if (freebaseNodeData.url_image != "")
         {
             try
             {
@@ -841,7 +736,7 @@ public class ConverserActivity extends Activity {
 
             URL Url = null;
             try {
-                Url = new URL(FreebaseNodeData.url_image);
+                Url = new URL(freebaseNodeData.url_image);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -854,7 +749,7 @@ public class ConverserActivity extends Activity {
             }
 
             final Bitmap Bitmap_ = Bitmap;
-            final FreebaseNodeData FreebaseNodeData_ = FreebaseNodeData;
+            final FreebaseNodeData freebaseNodeData_ = freebaseNodeData;
 
 
             ConverserActivity.this.runOnUiThread(new Runnable() {
@@ -862,8 +757,8 @@ public class ConverserActivity extends Activity {
                 @Override
                 public void run() {
 
-                    FreebaseNodeDisplay FreebaseNodeDisplay = new FreebaseNodeDisplay(ConverserActivity.this, FreebaseNodeData_);
-                    FreebaseNodeDisplay.setOnTouchListener(OnTouchListener_freebaseNodeDisplay);
+                    FreebaseNodeDisplay freebaseNodeDisplay = new FreebaseNodeDisplay(ConverserActivity.this, freebaseNodeData_);
+                    //FreebaseNodeDisplay.setOnTouchListener(OnTouchListener_freebaseNodeDisplay);
                     RelativeLayout RelativeLayout = (RelativeLayout) ConverserActivity.this.findViewById(R.id.RelativeLayout_mediaCanvas);
                     int w_layout = RelativeLayout.getWidth();
                     int h_layout = RelativeLayout.getHeight();
@@ -874,31 +769,31 @@ public class ConverserActivity extends Activity {
                     int y_max = h_layout - padding;
                     int x = new Random().nextInt(x_max - x_min + 1) + x_min;
                     int y = new Random().nextInt(y_max - y_min + 1) + y_min;
-                    FreebaseNodeDisplay.ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
-                    RelativeLayout.addView(FreebaseNodeDisplay);
-                    FreebaseNodeDisplay.setX(x);
-                    FreebaseNodeDisplay.setY(y);
+                    freebaseNodeDisplay.ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+                    RelativeLayout.addView(freebaseNodeDisplay);
+                    freebaseNodeDisplay.setX(x);
+                    freebaseNodeDisplay.setY(y);
 
-                    Log.d("foo", "imageview id   " + FreebaseNodeDisplay.getId());
-                    FreebaseNodeDisplay.ImageView.setImageBitmap(Bitmap_);
-                    FreebaseNodeDisplay.TextView.setText(FreebaseNodeData_.name);
-                    AnimateFreebaseNodeDisplay(FreebaseNodeDisplay);
+                    Log.d("foo", "imageview id   " + freebaseNodeDisplay.getId());
+                    freebaseNodeDisplay.ImageView.setImageBitmap(Bitmap_);
+                    freebaseNodeDisplay.TextView.setText(freebaseNodeData_.name);
+                    AnimateFreebaseNodeDisplay(freebaseNodeDisplay);
 
                     float scaleX_start = .01f;
                     float scaleX_stop = 1f;
                     float scaleY_start = .01f;
                     float scaleY_stop = 1f;
 
-                    FreebaseNodeDisplay.setScaleX(scaleX_start);
-                    FreebaseNodeDisplay.setScaleY(scaleY_start);
+                    freebaseNodeDisplay.setScaleX(scaleX_start);
+                    freebaseNodeDisplay.setScaleY(scaleY_start);
 
-                    ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "scaleX", scaleX_start, scaleX_stop);
+                    ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(freebaseNodeDisplay, "scaleX", scaleX_start, scaleX_stop);
                     ObjectAnimator_scaleX.setDuration(300);
                     ObjectAnimator_scaleX.setStartDelay(250);
                     ObjectAnimator_scaleX.setInterpolator(new DecelerateInterpolator());
                     ObjectAnimator_scaleX.start();
 
-                    ObjectAnimator ObjectAnimator_scaleY = ObjectAnimator.ofFloat(FreebaseNodeDisplay, "scaleY", scaleY_start, scaleY_stop);
+                    ObjectAnimator ObjectAnimator_scaleY = ObjectAnimator.ofFloat(freebaseNodeDisplay, "scaleY", scaleY_start, scaleY_stop);
                     ObjectAnimator_scaleY.setDuration(200);
                     ObjectAnimator_scaleY.start();
 
@@ -914,43 +809,6 @@ public class ConverserActivity extends Activity {
         }
     }
 
-    class FreebaseNodeDisplay extends LinearLayout
-    {
-
-        public FreebaseNodeData FreebaseNodeData;
-        public ImageView ImageView;
-        public TextView TextView;
-
-        public FreebaseNodeDisplay(Context Context, FreebaseNodeData FreebaseNodeData)
-        {
-            super(Context);
-
-            this.FreebaseNodeData = FreebaseNodeData;
-
-            this.Init();
-        }
-
-        private void Init()
-        {
-            this.setOrientation(VERTICAL);
-            this.CreateItemImageView();
-            this.CreateNameTextView();
-        }
-
-        private void CreateItemImageView()
-        {
-            this.ImageView = new ImageView(getContext());
-            this.addView(this.ImageView);
-        }
-
-        private void CreateNameTextView()
-        {
-            this.TextView = new TextView(getContext());
-            this.TextView.setTextColor(Color.parseColor("#cccccc"));
-            this.TextView.setTextSize(20);
-            this.addView(this.TextView);
-        }
-    }
 
     private void AnimateFreebaseNodeDisplay(FreebaseNodeDisplay FreebaseNodeDisplay)
     {
@@ -1082,9 +940,9 @@ public class ConverserActivity extends Activity {
         ObjectAnimator_x.start();
     }
 
-    private void SpeakFreebaseNodeText(FreebaseNodeData FreebaseNodeData)
+    private void SpeakFreebaseNodeText(FreebaseNodeData freebaseNodeData)
     {
-        String text = FreebaseNodeData.text;
+        String text = freebaseNodeData.text;
         String[] Sentences = text.split("\\.");
         String firstSentence = Sentences[0];
         this.Speak(firstSentence);
