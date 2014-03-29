@@ -1,25 +1,10 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    android:id="@+id/topContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ConverserActivity"
     tools:ignore="MergeRootFrame"
     android:background="#000000">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center"
-        android:id="@+id/RelativeLayout_ttsIndicator"></RelativeLayout>
-
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center"
-        android:id="@+id/RelativeLayout_mediaCanvas">
-
-    </RelativeLayout>
-
-</FrameLayout>
+</RelativeLayout>

@@ -73,6 +73,10 @@ class FreebaseNodeDisplay extends LinearLayout
     }
 
 
+    ///////////////////////////
+    //callbacks
+    ///////////////////////////
+
     private View.OnTouchListener OnTouchListener_this = new View.OnTouchListener()
     {
         @Override
