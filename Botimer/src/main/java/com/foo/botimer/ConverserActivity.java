@@ -62,6 +62,11 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import com.foo.botimer.FreebaseInterface.FreebaseNodeData;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 import android.media.MediaPlayer;
 
 
@@ -570,36 +575,50 @@ public class ConverserActivity extends Activity
 
 
 
+
+    private void Foo()
+    {
+        //File file = new File("/Users/hilo/Desktop/bike.jpg");
+        //Log.d("foo", String.valueOf(file.exists()));
+
+        /*
+        try {
+            HttpResponse<JsonNode> request = Unirest.post("https://camfind.p.mashape.com/image_requests")
+                    .header("X-Mashape-Authorization", "YMQQG7yJ4LsBWIrmnzS19ErBtWOTMHlW")
+                    .field("image_request[locale]", "en_US")
+                    .field("image_request[image]", file)
+                    .asJson();
+
+            int a = 1;
+
+
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        */
+
+
+    }
+
+
     private void dispatchTakePictureIntent()
     {
-        Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        if (true)
-        {
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File("/sdcard/tmp")));
-        }
-        //else
-        //{
-        //    i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        //}
-        startActivityForResult(i, 1);
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage.jpg");
+        Uri outputFileUri = Uri.fromFile(file);
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+        startActivityForResult(cameraIntent, 1);
 
+        //this.Foo();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
         Uri u;
-        if (true) {
-            File fi = new File("/sdcard/tmp");
-            try {
-                u = Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), fi.getAbsolutePath(), null, null));
-                if (!fi.delete()) {
-                    Log.i("logMarker", "Failed to delete " + fi);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+        //u = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), fi.getAbsolutePath(), null, null));
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage.jpg");
+        Log.d("foo", String.valueOf(file.exists()));
 
 
     }
