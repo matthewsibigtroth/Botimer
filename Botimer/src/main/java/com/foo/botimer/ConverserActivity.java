@@ -19,10 +19,12 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +39,9 @@ import android.view.Window;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -191,7 +196,8 @@ public class ConverserActivity extends Activity
     {
         @Override
         public void onClick(View view) {
-            listener.Listen();
+            //listener.Listen();
+            dispatchTakePictureIntent();
         }
     };
 
@@ -559,16 +565,46 @@ public class ConverserActivity extends Activity
         this.speaker.Speak(firstSentence);
     }
 
+
+
+
+
+
     private void dispatchTakePictureIntent()
     {
-        int REQUEST_IMAGE_CAPTURE = 1;
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null)
+        Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        if (true)
         {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File("/sdcard/tmp")));
         }
+        //else
+        //{
+        //    i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //}
+        startActivityForResult(i, 1);
+
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        Uri u;
+        if (true) {
+            File fi = new File("/sdcard/tmp");
+            try {
+                u = Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), fi.getAbsolutePath(), null, null));
+                if (!fi.delete()) {
+                    Log.i("logMarker", "Failed to delete " + fi);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -593,7 +629,18 @@ public class ConverserActivity extends Activity
             ImageView.setImageBitmap(imageBitmap);
             //AnimateImageView(ImageView);
         }
+
     }
+    */
+
+
+
+
+
+
+
+
+
 
     private void PlaySound(Uri Uri, int delay) throws IOException
     {
