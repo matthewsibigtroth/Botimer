@@ -1,6 +1,8 @@
 package com.foo.botimer;
 
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -57,7 +59,8 @@ public class Listener
 
     public void Listen()
     {
-        //this.MuteSystemStream();
+        //this.converserActivity.MuteSystemStream();
+
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         //intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,"voice.recognition.test");
@@ -68,6 +71,8 @@ public class Listener
 
     public void StopListening()
     {
+        //this.converserActivity.UnMuteSystemStream();
+
         this.converserActivity.runOnUiThread(new Runnable()
         {
             @Override

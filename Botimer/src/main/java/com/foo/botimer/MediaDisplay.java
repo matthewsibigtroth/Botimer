@@ -74,14 +74,14 @@ public class MediaDisplay extends RelativeLayout
         ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(freebaseNodeDisplay, "rotationY", rotationY_start, rotationY_stop);
         ObjectAnimator_rotateY.setDuration(120000);
 
-        ObjectAnimator_rotateY.addListener(AnimatorListener_mediaCanvasImage_animate);
+        ObjectAnimator_rotateY.addListener(AnimatorListener_freebaseNodeDisplay_animate);
 
         AnimatorSet AnimatorSet = new AnimatorSet();
         AnimatorSet.playTogether(ObjectAnimator_translateX, ObjectAnimator_translateY, ObjectAnimator_rotateZ, ObjectAnimator_rotateX, ObjectAnimator_rotateY);
         AnimatorSet.start();
     }
 
-    private Animator.AnimatorListener AnimatorListener_mediaCanvasImage_animate = new Animator.AnimatorListener()
+    private Animator.AnimatorListener AnimatorListener_freebaseNodeDisplay_animate = new Animator.AnimatorListener()
     {
         @Override
         public void onAnimationCancel(Animator arg0)
@@ -93,6 +93,78 @@ public class MediaDisplay extends RelativeLayout
         {
             FreebaseNodeDisplay FreebaseNodeDisplay = (FreebaseNodeDisplay) ((ObjectAnimator) Animator).getTarget();
             AnimateFreebaseNodeDisplay(FreebaseNodeDisplay);
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator arg0)
+        {
+        }
+
+        @Override
+        public void onAnimationStart(Animator arg0)
+        {
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+    public void AnimateCapturedImageeDisplay(CapturedImageDisplay capturedImageDisplay)
+    {
+        //RelativeLayout RelativeLayout = (RelativeLayout) this.findViewById(R.id.RelativeLayout_mediaCanvas);
+
+        int w_layout = this.getWidth();
+        int h_layout = this.getHeight();
+        int w_imageView = capturedImageDisplay.ImageView.getDrawable().getIntrinsicWidth();
+        int h_imageView = capturedImageDisplay.ImageView.getDrawable().getIntrinsicHeight();
+        int x_start = (int)capturedImageDisplay.getX();
+        int y_start = (int)capturedImageDisplay.getY();
+        int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
+        int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
+        int rotationZ_start = (int)capturedImageDisplay.getRotation();
+        int rotationZ_stop = new Random().nextInt(35) - 17;
+        int rotationX_start = (int)capturedImageDisplay.getRotationX();
+        int rotationX_stop = new Random().nextInt(35) - 17;
+        int rotationY_start = (int)capturedImageDisplay.getRotationY();
+        int rotationY_stop = new Random().nextInt(35) - 17;
+
+        ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(capturedImageDisplay, "translationX", x_start, x_stop);
+        ObjectAnimator_translateX.setDuration(40000);
+        ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(capturedImageDisplay, "translationY", y_start, y_stop);
+        ObjectAnimator_translateY.setDuration(60000);
+        ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(capturedImageDisplay,  "rotation", rotationZ_start, rotationZ_stop);
+        ObjectAnimator_rotateZ.setDuration(50000);
+        ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(capturedImageDisplay, "rotationX", rotationX_start, rotationX_stop);
+        ObjectAnimator_rotateX.setDuration(70000);
+        ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(capturedImageDisplay, "rotationY", rotationY_start, rotationY_stop);
+        ObjectAnimator_rotateY.setDuration(120000);
+
+        ObjectAnimator_rotateY.addListener(AnimatorListener_capturedImageDisplay_animate);
+
+        AnimatorSet AnimatorSet = new AnimatorSet();
+        AnimatorSet.playTogether(ObjectAnimator_translateX, ObjectAnimator_translateY, ObjectAnimator_rotateZ, ObjectAnimator_rotateX, ObjectAnimator_rotateY);
+        AnimatorSet.start();
+    }
+
+    private Animator.AnimatorListener AnimatorListener_capturedImageDisplay_animate = new Animator.AnimatorListener()
+    {
+        @Override
+        public void onAnimationCancel(Animator arg0)
+        {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator Animator)
+        {
+            CapturedImageDisplay capturedImageDisplay = (CapturedImageDisplay) ((ObjectAnimator) Animator).getTarget();
+            AnimateCapturedImageeDisplay(capturedImageDisplay);
         }
 
         @Override
