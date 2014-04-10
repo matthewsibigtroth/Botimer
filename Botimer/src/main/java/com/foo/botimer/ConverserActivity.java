@@ -92,6 +92,7 @@ public class ConverserActivity extends Activity
     public int H_SCREEN;
     private MediaDisplay mediaDisplay;
     private String imageRecognitionRequestToken;
+    private Button button_secretListen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -120,6 +121,7 @@ public class ConverserActivity extends Activity
         this.CreateListener();
         this.CreateThinkingDisplay();
         this.CreateMediaDisplay();
+        this.CreateSecretListenButton();
     }
 
     private void CreateFreebaseInterface()
@@ -195,6 +197,25 @@ public class ConverserActivity extends Activity
         this.topContainer.addView(this.mediaDisplay);
     }
 
+    private void CreateSecretListenButton()
+    {
+        this.button_secretListen = new Button(this);
+        this.button_secretListen.setText("Listen");
+        this.button_secretListen.setOnClickListener(OnClick_secretListenButton);
+        LinearLayout.LayoutParams LayoutParams =new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        this.button_secretListen.setLayoutParams(LayoutParams);
+        this.button_secretListen.setAlpha(.01f);
+        this.topContainer.addView(this.button_secretListen);
+    }
+
+    private View.OnClickListener OnClick_secretListenButton = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View view) {
+            listener.Listen();
+            Log.d("foo", "listen");
+        }
+    };
 
     /////////////////////////////////////
     //callbacks
@@ -326,14 +347,17 @@ public class ConverserActivity extends Activity
 
             this.thinkingDisplay.ShowThinkingIndicator();
             this.freebaseInterface.FindFreebaseNodeDataForInputText(subString);
+            return;
         }
-        if (recognizedSpeech.contains(hotPhrase_1))
+        else if (recognizedSpeech.contains(hotPhrase_1))
         {
             this.OpenCameraForImageCapture();
+            return;
         }
         else
         {
             this.SayToBot(recognizedSpeech);
+            return;
         }
     }
 
@@ -361,6 +385,7 @@ public class ConverserActivity extends Activity
             }
         });
     }
+
 
 
     ///////////////////////////
@@ -517,7 +542,7 @@ public class ConverserActivity extends Activity
 
                     int w_layout = W_SCREEN;
                     int h_layout = H_SCREEN;
-                    int padding = 200;
+                    int padding = 300;
                     int x_min = padding;
                     int x_max = w_layout - padding;
                     int y_min = padding;
@@ -678,7 +703,8 @@ public class ConverserActivity extends Activity
                 try
                 {
                     HttpResponse<JsonNode> request_uploadImage = Unirest.post("https://camfind.p.mashape.com/image_requests")
-                            .header("X-Mashape-Authorization", "YMQQG7yJ4LsBWIrmnzS19ErBtWOTMHlW")
+                            //.header("X-Mashape-Authorization", "YMQQG7yJ4LsBWIrmnzS19ErBtWOTMHlW")
+                            .header("X-Mashape-Authorization", "q5QVimyNMzOHw6VEbGOdxjO7bYfCMAOZ")
                             .field("image_request[locale]", "en_US")
                             .field("image_request[image]", file_resized)
                             .asJson();

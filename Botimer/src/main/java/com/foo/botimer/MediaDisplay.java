@@ -48,6 +48,7 @@ public class MediaDisplay extends RelativeLayout
     {
         //RelativeLayout RelativeLayout = (RelativeLayout) this.findViewById(R.id.RelativeLayout_mediaCanvas);
 
+        int padding = 300;
         int w_layout = this.getWidth();
         int h_layout = this.getHeight();
         int w_imageView = freebaseNodeDisplay.ImageView.getDrawable().getIntrinsicWidth();

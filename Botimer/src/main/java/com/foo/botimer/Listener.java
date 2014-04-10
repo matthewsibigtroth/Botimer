@@ -112,7 +112,7 @@ class RecognitionListenerExtended implements RecognitionListener
     {
         if ((error != 6) && (error!=7) && (error!=5)) {return;}
 
-        if (shouldContinuoslyListen == true) {this.listener.Listen();}
+        //if (shouldContinuoslyListen == true) {this.listener.Listen();}
     }
 
     public void onResults(Bundle results)
