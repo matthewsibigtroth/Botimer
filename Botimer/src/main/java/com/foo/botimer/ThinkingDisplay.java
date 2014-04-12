@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -24,6 +26,8 @@ public class ThinkingDisplay extends RelativeLayout
     private boolean shouldAnimateTtsIndicators;
     private ProgressBar ThinkingIndicator;
     private Random random;
+    private ProgressBar progressIndicator;
+    private CountDownTimer progressCountDownTimer;
 
     public ThinkingDisplay(Context context)
     {
@@ -42,6 +46,8 @@ public class ThinkingDisplay extends RelativeLayout
 
         this.InitLayoutParams();
         this.CreateThinkingIndicator();
+        this.CreateProgressIndicator();
+        this.CreateProgressCountDownTimer();
         this.CreateTtsIndicators();
     }
 
@@ -60,6 +66,66 @@ public class ThinkingDisplay extends RelativeLayout
         float x = this.converserActivity.W_SCREEN/2 - 35;
         this.ThinkingIndicator.setX(x);
         this.addView(this.ThinkingIndicator);
+    }
+
+    private void CreateProgressIndicator()
+    {
+        this.progressIndicator = new ProgressBar(this.getContext(), null, android.R.attr.progressBarStyleHorizontal);
+        //this.progressIndicator.setAlpha(0);
+        float x = this.converserActivity.W_SCREEN/2 - 17;
+        this.progressIndicator.setX(x);
+        this.progressIndicator.setY(33);
+        this.addView(this.progressIndicator);
+        this.progressIndicator.setProgress(0);
+        LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        layoutParams.width = 60;
+        this.progressIndicator.setLayoutParams(layoutParams);
+
+
+    }
+
+    private void CreateProgressCountDownTimer()
+    {
+        final long countDownDuration = 16000;
+        long tick = 100;
+        this.progressCountDownTimer = new CountDownTimer(countDownDuration, tick)
+        {
+            @Override
+            public void onTick(long timeRemaining)
+            {
+                long timeProgressed = countDownDuration - timeRemaining;
+                float normalizedTimeProgressed = timeProgressed / (float) countDownDuration;
+                int progress = (int)(normalizedTimeProgressed * 100f);
+                progressIndicator.setProgress(progress);
+            }
+
+            @Override
+            public void onFinish()
+            {
+                Log.d("foo", "progress count down finishted");
+                HideProgressIndicator();
+            }
+        };
+    }
+
+    public void StartProgressCountDownTimer()
+    {
+        Log.d("foo", "StartProgressCountDownTimer");
+
+        this.ShowProgressIndicator();
+        this.progressCountDownTimer.start();
+    }
+
+    private void ShowProgressIndicator()
+    {
+        this.progressIndicator.setAlpha(1);
+    }
+
+    private void HideProgressIndicator()
+    {
+        ObjectAnimator ObjectAnimator_alpha = ObjectAnimator.ofFloat(this.progressIndicator, "alpha", this.progressIndicator.getAlpha(), 0);
+        ObjectAnimator_alpha.setDuration(500);
+        ObjectAnimator_alpha.start();
     }
 
     private void CreateTtsIndicators()

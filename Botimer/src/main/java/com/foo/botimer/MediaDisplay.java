@@ -15,6 +15,7 @@ public class MediaDisplay extends RelativeLayout
 {
 
     private ConverserActivity converserActivity;
+    private Random random;
 
     public MediaDisplay(Context context)
     {
@@ -27,6 +28,8 @@ public class MediaDisplay extends RelativeLayout
 
     private void Init()
     {
+        this.random = new Random();
+
         this.InitLayoutParams();
     }
 
@@ -48,15 +51,19 @@ public class MediaDisplay extends RelativeLayout
     {
         //RelativeLayout RelativeLayout = (RelativeLayout) this.findViewById(R.id.RelativeLayout_mediaCanvas);
 
-        int padding = 300;
-        int w_layout = this.getWidth();
-        int h_layout = this.getHeight();
+        int w_layout = this.converserActivity.W_SCREEN;
+        int h_layout = this.converserActivity.H_SCREEN;
         int w_imageView = freebaseNodeDisplay.ImageView.getDrawable().getIntrinsicWidth();
         int h_imageView = freebaseNodeDisplay.ImageView.getDrawable().getIntrinsicHeight();
+        int padding = 400;
+        int x_min = padding;
+        int x_max = w_layout - padding;
+        int y_min = padding;
+        int y_max = h_layout - padding;
         int x_start = (int)freebaseNodeDisplay.getX();
         int y_start = (int)freebaseNodeDisplay.getY();
-        int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
-        int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
+        int x_stop = this.random.nextInt(x_max - x_min + 1) + x_min;
+        int y_stop = this.random.nextInt(y_max - y_min + 1) + y_min;
         int rotationZ_start = (int)freebaseNodeDisplay.getRotation();
         int rotationZ_stop = new Random().nextInt(35) - 17;
         int rotationX_start = (int)freebaseNodeDisplay.getRotationX();
@@ -121,14 +128,20 @@ public class MediaDisplay extends RelativeLayout
     {
         //RelativeLayout RelativeLayout = (RelativeLayout) this.findViewById(R.id.RelativeLayout_mediaCanvas);
 
-        int w_layout = this.getWidth();
-        int h_layout = this.getHeight();
+        int w_layout = this.converserActivity.W_SCREEN;
+        int h_layout = this.converserActivity.H_SCREEN;
         int w_imageView = capturedImageDisplay.ImageView.getDrawable().getIntrinsicWidth();
         int h_imageView = capturedImageDisplay.ImageView.getDrawable().getIntrinsicHeight();
+
+        int padding = 400;
+        int x_min = padding;
+        int x_max = w_layout - padding;
+        int y_min = padding;
+        int y_max = h_layout - padding;
         int x_start = (int)capturedImageDisplay.getX();
         int y_start = (int)capturedImageDisplay.getY();
-        int x_stop = new Random().nextInt(w_layout) - w_imageView/2;
-        int y_stop = new Random().nextInt(h_layout) - h_imageView/2;
+        int x_stop = this.random.nextInt(x_max - x_min + 1) + x_min;
+        int y_stop = this.random.nextInt(y_max - y_min + 1) + y_min;
         int rotationZ_start = (int)capturedImageDisplay.getRotation();
         int rotationZ_stop = new Random().nextInt(35) - 17;
         int rotationX_start = (int)capturedImageDisplay.getRotationX();

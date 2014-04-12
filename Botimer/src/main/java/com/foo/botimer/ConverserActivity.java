@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -54,6 +55,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import android.net.Uri;
 import android.speech.tts.UtteranceProgressListener;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 import android.media.AudioManager;
@@ -70,6 +73,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import android.media.MediaPlayer;
+//import com.stromberglabs.cluster.;
+
 
 
 public class ConverserActivity extends Activity
@@ -93,6 +98,7 @@ public class ConverserActivity extends Activity
     private MediaDisplay mediaDisplay;
     private String imageRecognitionRequestToken;
     private Button button_secretListen;
+    private String activityResultPendingType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -111,6 +117,7 @@ public class ConverserActivity extends Activity
         this.W_SCREEN = getWindowManager().getDefaultDisplay().getWidth();
         this.H_SCREEN = getWindowManager().getDefaultDisplay().getHeight();
         this.imageRecognitionRequestToken = "";
+        this.activityResultPendingType = "";
 
         this.CreateAdminView();
         this.CreateListenButton();
@@ -203,19 +210,13 @@ public class ConverserActivity extends Activity
         this.button_secretListen.setText("Listen");
         this.button_secretListen.setOnClickListener(OnClick_secretListenButton);
         LinearLayout.LayoutParams LayoutParams =new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LayoutParams.height = 150;
         this.button_secretListen.setLayoutParams(LayoutParams);
         this.button_secretListen.setAlpha(.01f);
         this.topContainer.addView(this.button_secretListen);
     }
 
-    private View.OnClickListener OnClick_secretListenButton = new View.OnClickListener()
-    {
-        @Override
-        public void onClick(View view) {
-            listener.Listen();
-            Log.d("foo", "listen");
-        }
-    };
+
 
     /////////////////////////////////////
     //callbacks
@@ -227,6 +228,15 @@ public class ConverserActivity extends Activity
         @Override
         public void onClick(View view) {
             listener.Listen();
+        }
+    };
+
+    private View.OnClickListener OnClick_secretListenButton = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View view) {
+            listener.Listen();
+            //
         }
     };
 
@@ -337,7 +347,7 @@ public class ConverserActivity extends Activity
         Log.d("foo", "robot heard:  " + recognizedSpeech);
 
         String hotPhrase_0 = "show me";
-        String hotPhrase_1 = "tell me more about this";
+        String hotPhrase_1 = "what do you see";
         if (recognizedSpeech.contains(hotPhrase_0))
         {
             int index_tellMeAbout = recognizedSpeech.indexOf(hotPhrase_0);
@@ -386,6 +396,23 @@ public class ConverserActivity extends Activity
         });
     }
 
+    private void OnImageRecognitionAnalysisComplete(String recognizedObject)
+    {
+        //if nothing was recognized
+        if (recognizedObject == "")
+        {
+            this.speaker.Speak("I'm not sure I know what that is");
+        }
+        //if something was recognized
+        else
+        {
+            this.speaker.Speak("Oh, this looks like a " + recognizedObject);
+            this.CreateCapturedImageDisplay(recognizedObject);
+            this.thinkingDisplay.ShowThinkingIndicator();
+            this.freebaseInterface.FindFreebaseNodeDataForInputText(recognizedObject);
+        }
+
+    }
 
 
     ///////////////////////////
@@ -638,32 +665,32 @@ public class ConverserActivity extends Activity
         Uri outputFileUri = Uri.fromFile(file);
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+        this.activityResultPendingType = "capturedImage_forObjectRecognition";
         startActivityForResult(cameraIntent, 1);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
-        this.speaker.Speak("Let me think about this for a second");
-        this.CreateResizedCameraCapturedImage();
-        this.PostResizedImageToCamFind();
-        this.AskCamFindToRecognizeImage();
-
-        //this.OnImageRecognitionAnalysisComplete("banana");
-
-        //String tokenString = "{'token':'xx_iWs-QRKS7arp6XsuHGQ'}";
-        //String token = tokenString.substring(10, tokenString.length() - 2);
-        //Log.d("foo", token);
-
-        //String recognitionString = "{status':'completed','name':'silver laptop'}";
-        //String recognizedObject = recognitionString.substring(29, recognitionString.length() - 2);
-        //Log.d("foo", recognizedObject);
-
-
-
+        Log.d("foo", "onActivityResult    resultCode:   " + String.valueOf(resultCode));
+        if (resultCode == -1)
+        {
+            if (this.activityResultPendingType == "capturedImage_forObjectRecognition") {this.HandleActivityResult_capturedImageForObjectRecognition();}
+            else if (this.activityResultPendingType == "catpuredImage_forPaletteDetection") {this.HandleActivityResult_capturedImageForPaletteDetection();}
+        }
     }
 
-    private void CreateResizedCameraCapturedImage()
+    private void HandleActivityResult_capturedImageForObjectRecognition()
+    {
+        this.activityResultPendingType = "";
+        this.speaker.Speak("Let me think about this for a moment");
+        this.CreateResizedCameraCapturedImage(640, 480);
+        this.PostResizedImageToCamFind();
+        this.AskCamFindToRecognizeImage();
+        this.thinkingDisplay.StartProgressCountDownTimer();
+    }
+
+    private void CreateResizedCameraCapturedImage(int w_new, int h_new)
     {
         String filePath_image_original = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage.jpg";
         String filePath_image_resized = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
@@ -671,12 +698,13 @@ public class ConverserActivity extends Activity
         int w_bitmap_orig = bitmap_orig.getWidth();
         int h_bitmap_orig = bitmap_orig.getHeight();
         Bitmap bitmap_resized;
-        if (w_bitmap_orig > h_bitmap_orig) {bitmap_resized = Bitmap.createScaledBitmap(bitmap_orig, 640, 480, false);}
-        else {bitmap_resized = Bitmap.createScaledBitmap(bitmap_orig, 480, 640, false);}
+        if (w_bitmap_orig > h_bitmap_orig) {bitmap_resized = Bitmap.createScaledBitmap(bitmap_orig, w_new, h_new, false);}
+        else {bitmap_resized = Bitmap.createScaledBitmap(bitmap_orig, h_new, w_new, false);}
 
         File file_resized = new File(filePath_image_resized);
         FileOutputStream fOut;
-        try {
+        try
+        {
             fOut = new FileOutputStream(file_resized);
             bitmap_resized.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
             fOut.flush();
@@ -684,11 +712,12 @@ public class ConverserActivity extends Activity
             bitmap_orig.recycle();
             bitmap_resized.recycle();
 
-        } catch (Exception e) { // TODO
+        }
+        catch (Exception e)
+        {
 
         }
     }
-
 
     private void PostResizedImageToCamFind()
     {
@@ -773,21 +802,12 @@ public class ConverserActivity extends Activity
                 };
                 Thread thread = new Thread(runnable);
                 thread.start();
-
             }
 
         };
 
         long delay = 15000;
         delayHandler.postDelayed(runnable, delay);
-    }
-
-    private void OnImageRecognitionAnalysisComplete(String recognizedObject)
-    {
-        this.speaker.Speak("Oh, this looks like a " + recognizedObject);
-        this.CreateCapturedImageDisplay(recognizedObject);
-        this.thinkingDisplay.ShowThinkingIndicator();
-        this.freebaseInterface.FindFreebaseNodeDataForInputText(recognizedObject);
     }
 
     private void CreateCapturedImageDisplay(String recognizedObject)
@@ -802,9 +822,10 @@ public class ConverserActivity extends Activity
 
                 CapturedImageDisplay capturedImageDisplay = new CapturedImageDisplay(ConverserActivity.this, recognizedObject_);
 
+
                 int w_layout = W_SCREEN;
                 int h_layout = H_SCREEN;
-                int padding = 200;
+                int padding = 400;
                 int x_min = padding;
                 int x_max = w_layout - padding;
                 int y_min = padding;
@@ -845,6 +866,64 @@ public class ConverserActivity extends Activity
         });
 
     }
+
+    private void HandleActivityResult_capturedImageForPaletteDetection()
+    {
+        this.activityResultPendingType = "";
+        //this.CreateResizedCameraCapturedImage();
+
+        //String filePath_image_resized = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+        //File file_resized = new File(filePath_image_resized);
+        //String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+        //Bitmap bitmap = BitmapFactory.decodeFile(filePath_image);
+        //int color = bitmap.getPixel(0,0);
+
+    }
+
+    private void Foo()
+    {
+        Log.d("foo", "Foo");
+
+
+
+
+        /*
+        String filePath_image_resized = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+        File file_resized = new File(filePath_image_resized);
+        String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+        Bitmap bitmap = BitmapFactory.decodeFile(filePath_image);
+        int w_bitmap = bitmap.getWidth();
+        int h_bitmap = bitmap.getHeight();
+        //List<Clusterable> mPoints
+        for (int row=0; row<h_bitmap; row++)
+        {
+            for (int column=0; column<w_bitmap; column++)
+            {
+                int pixel = bitmap.getPixel(column, row);
+                //Log.d("foo", String.valueOf(pixel));
+                //int a = Color.alpha(pixel);
+                int r = Color.red(pixel);
+                int g = Color.green(pixel);
+                int b = Color.blue(pixel);
+                //String hexColorString = String.format("#%02X%02X%02X%02X", a, r, g, b);
+                //int hexInt = Color.parseColor(hexColorString);
+
+                //String hexColor = String.format("#%08X", pixel);
+                //int hexInt = Color.parseColor(hexColor);
+                //int RGB = android.graphics.Color.rgb(r, g, b);
+                //Log.d("foo", String.valueOf(hexInt));
+            }
+        }
+
+        Log.d("foo", "done reading image data");
+        */
+
+
+    }
+
+
+
+
 
 
 

@@ -82,6 +82,7 @@ public class FreebaseInterface
     public void FindFreebaseNodeDataForInputText(String inputText)
     {
         this.ConverserActivity.PrintToDebugOutput("FindFreebaseNodeDataForInputText");
+        Log.d("foo", "FindFreebaseNodeDataForInputText");
         ConverserActivity.PrintToDebugOutput(" * ");
         ConverserActivity.PrintToDebugOutput(" * ");
         ConverserActivity.PrintToDebugOutput(" * ");
@@ -101,10 +102,12 @@ public class FreebaseInterface
 
                     if (TopicData.length() == 0)
                     {
+                        Log.d("foo", "FindFreebaseNodeDataForInputText   no topics found");
                         OnComplete_findFreebaseNodeDataForInputText(null, inputText__);
                     }
                     else
                     {
+                        Log.d("foo", "FindFreebaseNodeDataForInputText   topics were found");
                         JSONObject TopicDatum = new JSONObject(TopicData.get(0).toString());
                         FreebaseNodeData FreebaseNodeData = CreateFreebaseNodeDataForTopicDatum(TopicDatum);
                         OnComplete_findFreebaseNodeDataForInputText(FreebaseNodeData, inputText__);
