@@ -46,6 +46,8 @@ class FreebaseNodeDisplay extends LinearLayout
         this.CreateNameTextView();
         this.CreateGestureDetector();
         this.CreateTouchListener();
+
+        this.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
 
     private void CreateItemImageView()

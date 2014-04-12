@@ -99,6 +99,7 @@ public class ConverserActivity extends Activity
     private String imageRecognitionRequestToken;
     private Button button_secretListen;
     private String activityResultPendingType;
+    private Random random;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -118,6 +119,7 @@ public class ConverserActivity extends Activity
         this.H_SCREEN = getWindowManager().getDefaultDisplay().getHeight();
         this.imageRecognitionRequestToken = "";
         this.activityResultPendingType = "";
+        this.random = new Random();
 
         this.CreateAdminView();
         this.CreateListenButton();
@@ -569,13 +571,14 @@ public class ConverserActivity extends Activity
 
                     int w_layout = W_SCREEN;
                     int h_layout = H_SCREEN;
-                    int padding = 300;
-                    int x_min = padding;
-                    int x_max = w_layout - padding;
-                    int y_min = padding;
-                    int y_max = h_layout - padding;
-                    int x = new Random().nextInt(x_max - x_min + 1) + x_min;
-                    int y = new Random().nextInt(y_max - y_min + 1) + y_min;
+                    int w_imageView = Bitmap_.getWidth();
+                    int h_imageView = Bitmap_.getHeight();
+                    int x_min = 0;
+                    int x_max = w_layout - w_imageView;
+                    int y_min = 0;
+                    int y_max = h_layout - h_imageView;
+                    int x = random.nextInt(x_max - x_min + 1) + x_min;
+                    int y = random.nextInt(y_max - y_min + 1) + y_min;
                     freebaseNodeDisplay.ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
                     mediaDisplay.addView(freebaseNodeDisplay);
                     freebaseNodeDisplay.setX(x);
@@ -822,24 +825,24 @@ public class ConverserActivity extends Activity
 
                 CapturedImageDisplay capturedImageDisplay = new CapturedImageDisplay(ConverserActivity.this, recognizedObject_);
 
+                String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+                Bitmap bitmap = BitmapFactory.decodeFile(filePath_image);
 
                 int w_layout = W_SCREEN;
                 int h_layout = H_SCREEN;
-                int padding = 400;
-                int x_min = padding;
-                int x_max = w_layout - padding;
-                int y_min = padding;
-                int y_max = h_layout - padding;
-                int x = new Random().nextInt(x_max - x_min + 1) + x_min;
-                int y = new Random().nextInt(y_max - y_min + 1) + y_min;
+                int w_imageView = bitmap.getWidth();
+                int h_imageView = bitmap.getHeight();
+                int x_min = 0;
+                int x_max = w_layout - w_imageView;
+                int y_min = 0;
+                int y_max = h_layout - h_imageView;
+                int x = random.nextInt(x_max - x_min + 1) + x_min;
+                int y = random.nextInt(y_max - y_min + 1) + y_min;
                 capturedImageDisplay.ImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER);
                 mediaDisplay.addView(capturedImageDisplay);
                 capturedImageDisplay.setX(x);
                 capturedImageDisplay.setY(y);
 
-
-                String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
-                Bitmap bitmap = BitmapFactory.decodeFile(filePath_image);
                 capturedImageDisplay.ImageView.setImageBitmap(bitmap);
                 capturedImageDisplay.TextView.setText(capturedImageDisplay.recognizedObject);
                 mediaDisplay.AnimateCapturedImageeDisplay(capturedImageDisplay);

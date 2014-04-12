@@ -55,11 +55,10 @@ public class MediaDisplay extends RelativeLayout
         int h_layout = this.converserActivity.H_SCREEN;
         int w_imageView = freebaseNodeDisplay.ImageView.getDrawable().getIntrinsicWidth();
         int h_imageView = freebaseNodeDisplay.ImageView.getDrawable().getIntrinsicHeight();
-        int padding = 400;
-        int x_min = padding;
-        int x_max = w_layout - padding;
-        int y_min = padding;
-        int y_max = h_layout - padding;
+        int x_min = 0;
+        int x_max = w_layout - w_imageView;
+        int y_min = 0;
+        int y_max = h_layout - h_imageView;
         int x_start = (int)freebaseNodeDisplay.getX();
         int y_start = (int)freebaseNodeDisplay.getY();
         int x_stop = this.random.nextInt(x_max - x_min + 1) + x_min;
@@ -71,16 +70,17 @@ public class MediaDisplay extends RelativeLayout
         int rotationY_start = (int)freebaseNodeDisplay.getRotationY();
         int rotationY_stop = new Random().nextInt(35) - 17;
 
+        int speedFactor = 10;
         ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(freebaseNodeDisplay, "translationX", x_start, x_stop);
-        ObjectAnimator_translateX.setDuration(40000);
+        ObjectAnimator_translateX.setDuration(400*speedFactor);
         ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(freebaseNodeDisplay, "translationY", y_start, y_stop);
-        ObjectAnimator_translateY.setDuration(60000);
+        ObjectAnimator_translateY.setDuration(600*speedFactor);
         ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(freebaseNodeDisplay,  "rotation", rotationZ_start, rotationZ_stop);
-        ObjectAnimator_rotateZ.setDuration(50000);
+        ObjectAnimator_rotateZ.setDuration(500*speedFactor);
         ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(freebaseNodeDisplay, "rotationX", rotationX_start, rotationX_stop);
-        ObjectAnimator_rotateX.setDuration(70000);
+        ObjectAnimator_rotateX.setDuration(700*speedFactor);
         ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(freebaseNodeDisplay, "rotationY", rotationY_start, rotationY_stop);
-        ObjectAnimator_rotateY.setDuration(120000);
+        ObjectAnimator_rotateY.setDuration(1200*speedFactor);
 
         ObjectAnimator_rotateY.addListener(AnimatorListener_freebaseNodeDisplay_animate);
 
@@ -132,12 +132,10 @@ public class MediaDisplay extends RelativeLayout
         int h_layout = this.converserActivity.H_SCREEN;
         int w_imageView = capturedImageDisplay.ImageView.getDrawable().getIntrinsicWidth();
         int h_imageView = capturedImageDisplay.ImageView.getDrawable().getIntrinsicHeight();
-
-        int padding = 400;
-        int x_min = padding;
-        int x_max = w_layout - padding;
-        int y_min = padding;
-        int y_max = h_layout - padding;
+        int x_min = 0;
+        int x_max = w_layout - w_imageView;
+        int y_min = 0;
+        int y_max = h_layout - h_imageView;
         int x_start = (int)capturedImageDisplay.getX();
         int y_start = (int)capturedImageDisplay.getY();
         int x_stop = this.random.nextInt(x_max - x_min + 1) + x_min;
@@ -149,16 +147,17 @@ public class MediaDisplay extends RelativeLayout
         int rotationY_start = (int)capturedImageDisplay.getRotationY();
         int rotationY_stop = new Random().nextInt(35) - 17;
 
+        int speedFactor = 10;
         ObjectAnimator ObjectAnimator_translateX = ObjectAnimator.ofFloat(capturedImageDisplay, "translationX", x_start, x_stop);
-        ObjectAnimator_translateX.setDuration(40000);
+        ObjectAnimator_translateX.setDuration(400*speedFactor);
         ObjectAnimator ObjectAnimator_translateY = ObjectAnimator.ofFloat(capturedImageDisplay, "translationY", y_start, y_stop);
-        ObjectAnimator_translateY.setDuration(60000);
+        ObjectAnimator_translateY.setDuration(600*speedFactor);
         ObjectAnimator ObjectAnimator_rotateZ= ObjectAnimator.ofFloat(capturedImageDisplay,  "rotation", rotationZ_start, rotationZ_stop);
-        ObjectAnimator_rotateZ.setDuration(50000);
+        ObjectAnimator_rotateZ.setDuration(500*speedFactor);
         ObjectAnimator ObjectAnimator_rotateX = ObjectAnimator.ofFloat(capturedImageDisplay, "rotationX", rotationX_start, rotationX_stop);
-        ObjectAnimator_rotateX.setDuration(70000);
+        ObjectAnimator_rotateX.setDuration(700*speedFactor);
         ObjectAnimator ObjectAnimator_rotateY = ObjectAnimator.ofFloat(capturedImageDisplay, "rotationY", rotationY_start, rotationY_stop);
-        ObjectAnimator_rotateY.setDuration(120000);
+        ObjectAnimator_rotateY.setDuration(1200*speedFactor);
 
         ObjectAnimator_rotateY.addListener(AnimatorListener_capturedImageDisplay_animate);
 
