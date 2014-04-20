@@ -663,7 +663,10 @@ public class ConverserActivity extends Activity
 
     private void OpenCameraForImageCapture()
     {
-        String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage.jpg";
+        Log.d("foo", "OpenCameraForImageCapture");
+        //String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage.jpg";
+        //String filePath_image = this.getExternalFilesDir(null).getAbsolutePath() + "/botimer/images/myImage.jpg";
+        String filePath_image = this.getExternalFilesDir(null).getAbsolutePath() + "/myImage.jpg";
         File file = new File(filePath_image);
         Uri outputFileUri = Uri.fromFile(file);
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -695,8 +698,11 @@ public class ConverserActivity extends Activity
 
     private void CreateResizedCameraCapturedImage(int w_new, int h_new)
     {
-        String filePath_image_original = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage.jpg";
-        String filePath_image_resized = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+        //String filePath_image_original = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage.jpg";
+        //String filePath_image_resized = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+        String filePath_image_original = this.getExternalFilesDir(null).getAbsolutePath() + "/myImage.jpg";
+        String filePath_image_resized = this.getExternalFilesDir(null).getAbsolutePath() + "/myImage_resized.jpg";
+
         Bitmap bitmap_orig = BitmapFactory.decodeFile(filePath_image_original);
         int w_bitmap_orig = bitmap_orig.getWidth();
         int h_bitmap_orig = bitmap_orig.getHeight();
@@ -729,7 +735,8 @@ public class ConverserActivity extends Activity
             public void run()
             {
 
-                String filePath_image_resized = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+                //String filePath_image_resized = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+                String filePath_image_resized = getExternalFilesDir(null).getAbsolutePath() + "/myImage_resized.jpg";
                 File file_resized = new File(filePath_image_resized);
 
                 try
@@ -825,7 +832,8 @@ public class ConverserActivity extends Activity
 
                 CapturedImageDisplay capturedImageDisplay = new CapturedImageDisplay(ConverserActivity.this, recognizedObject_);
 
-                String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+                //String filePath_image = Environment.getExternalStorageDirectory().getAbsolutePath() + "/botimer/images/myImage_resized.jpg";
+                String filePath_image = getExternalFilesDir(null).getAbsolutePath() + "/myImage_resized.jpg";
                 Bitmap bitmap = BitmapFactory.decodeFile(filePath_image);
 
                 int w_layout = W_SCREEN;
