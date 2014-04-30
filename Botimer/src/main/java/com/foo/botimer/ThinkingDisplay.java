@@ -63,7 +63,7 @@ public class ThinkingDisplay extends RelativeLayout
     {
         this.ThinkingIndicator = new ProgressBar(this.getContext(), null, android.R.attr.progressBarStyle);
         this.ThinkingIndicator.setAlpha(0);
-        float x = this.converserActivity.W_SCREEN/2 - 35;
+        float x = this.converserActivity.W_SCREEN/2 - 70;
         this.ThinkingIndicator.setX(x);
         this.addView(this.ThinkingIndicator);
     }
@@ -72,13 +72,14 @@ public class ThinkingDisplay extends RelativeLayout
     {
         this.progressIndicator = new ProgressBar(this.getContext(), null, android.R.attr.progressBarStyleHorizontal);
         //this.progressIndicator.setAlpha(0);
-        float x = this.converserActivity.W_SCREEN/2 - 17;
+        float x = this.converserActivity.W_SCREEN/2 - 43;
+        float y = 50;
         this.progressIndicator.setX(x);
-        this.progressIndicator.setY(33);
+        this.progressIndicator.setY(y);
         this.addView(this.progressIndicator);
         this.progressIndicator.setProgress(0);
         LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams.width = 60;
+        layoutParams.width = 90;
         this.progressIndicator.setLayoutParams(layoutParams);
 
 
@@ -131,7 +132,7 @@ public class ThinkingDisplay extends RelativeLayout
     private void CreateTtsIndicators()
     {
         int numRows = 3;
-        int numColumns = 30;
+        int numColumns = 27;
         int w_tile = 40;
         int h_tile = 40;
         int offsetX = w_tile/2;
@@ -162,8 +163,8 @@ public class ThinkingDisplay extends RelativeLayout
         TtsIndicator.setX(x_imageView);
         TtsIndicator.setY(y_imageView);
         TtsIndicator.setAlpha(.5f);
-        TtsIndicator.setScaleX(.3f);
-        TtsIndicator.setScaleY(.3f);
+        TtsIndicator.setScaleX(.2f);
+        TtsIndicator.setScaleY(.2f);
         this.TtsIndicators.add(TtsIndicator);
     }
 
@@ -171,7 +172,7 @@ public class ThinkingDisplay extends RelativeLayout
     {
         int delay = (new Random()).nextInt(350);
         int duration  = (new Random()).nextInt(500);
-        float scale_start = .3f;
+        float scale_start = .2f;
         float scale_stop = .6f;
         ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(TtsIndicator, "scaleX", scale_start, scale_stop);
         ObjectAnimator_scaleX.setDuration(duration);
@@ -190,7 +191,7 @@ public class ThinkingDisplay extends RelativeLayout
         int delay = (new Random()).nextInt(150);
         int duration  = (new Random()).nextInt(500);
         float scale_start = .6f;
-        float scale_stop = .3f;
+        float scale_stop = .2f;
         ObjectAnimator ObjectAnimator_scaleX = ObjectAnimator.ofFloat(TtsIndicator, "scaleX", scale_start, scale_stop);
         ObjectAnimator_scaleX.setDuration(duration);
         ObjectAnimator_scaleX.setStartDelay(delay);

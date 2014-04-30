@@ -348,12 +348,26 @@ public class ConverserActivity extends Activity
     {
         Log.d("foo", "robot heard:  " + recognizedSpeech);
 
-        String hotPhrase_0 = "show me";
+        String hotPhrase_0a = "show me";
+        String hotPhrase_0b = "what do you know about";
+        String hotPhrase_0c = "who is";
+        String hotPhrase_0d = "where is";
+        String hotPhrase_0e = "what is";
+
         String hotPhrase_1 = "what do you see";
-        if (recognizedSpeech.contains(hotPhrase_0))
+
+        String hotPhrase_recognized = "";
+        if (recognizedSpeech.contains(hotPhrase_0a)) {hotPhrase_recognized = hotPhrase_0a;}
+        if (recognizedSpeech.contains(hotPhrase_0b)) {hotPhrase_recognized = hotPhrase_0b;}
+        if (recognizedSpeech.contains(hotPhrase_0c)) {hotPhrase_recognized = hotPhrase_0c;}
+        if (recognizedSpeech.contains(hotPhrase_0d)) {hotPhrase_recognized = hotPhrase_0d;}
+        if (recognizedSpeech.contains(hotPhrase_0e)) {hotPhrase_recognized = hotPhrase_0e;}
+        if (recognizedSpeech.contains(hotPhrase_1)) {hotPhrase_recognized = hotPhrase_1;}
+
+        if (recognizedSpeech.contains(hotPhrase_0a) || recognizedSpeech.contains(hotPhrase_0b) || recognizedSpeech.contains(hotPhrase_0c) || recognizedSpeech.contains(hotPhrase_0d) || recognizedSpeech.contains(hotPhrase_0e))
         {
-            int index_tellMeAbout = recognizedSpeech.indexOf(hotPhrase_0);
-            int index_start = index_tellMeAbout + hotPhrase_0.length();
+            int index_tellMeAbout = recognizedSpeech.indexOf(hotPhrase_recognized);
+            int index_start = index_tellMeAbout + hotPhrase_recognized.length();
             int index_stop = recognizedSpeech.length();
             String subString = recognizedSpeech.substring(index_start, index_stop);
 

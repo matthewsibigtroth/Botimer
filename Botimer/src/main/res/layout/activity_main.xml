@@ -10,7 +10,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Show Converser"
+        android:text="Start!"
         android:id="@+id/Button_showConverser"
         android:layout_gravity="left|top" />
 </FrameLayout>

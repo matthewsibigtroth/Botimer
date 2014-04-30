@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kmeansclustering">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Botimer/libs/kmeansclustering.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
