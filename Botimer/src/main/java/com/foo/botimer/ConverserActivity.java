@@ -353,6 +353,20 @@ public class ConverserActivity extends Activity
         String hotPhrase_0c = "who is";
         String hotPhrase_0d = "where is";
         String hotPhrase_0e = "what is";
+        String hotPhrase_0f = "what is a";
+        String hotPhrase_0g = "what is the";
+        String hotPhrase_0h = "tell me about";
+        String hotPhrase_0i = "who is the";
+        String hotPhrase_0j = "where is the";
+        String hotPhrase_0k = "tell me about the";
+        String hotPhrase_0l = "have you ever heard of";
+        //String hotPhrase_0m = "what is";
+        //String hotPhrase_0n = "what is";
+        //String hotPhrase_0o = "what is";
+        //String hotPhrase_0p = "what is";
+        //String hotPhrase_0q = "what is";
+
+
 
         String hotPhrase_1 = "what do you see";
 
@@ -362,9 +376,28 @@ public class ConverserActivity extends Activity
         if (recognizedSpeech.contains(hotPhrase_0c)) {hotPhrase_recognized = hotPhrase_0c;}
         if (recognizedSpeech.contains(hotPhrase_0d)) {hotPhrase_recognized = hotPhrase_0d;}
         if (recognizedSpeech.contains(hotPhrase_0e)) {hotPhrase_recognized = hotPhrase_0e;}
+        if (recognizedSpeech.contains(hotPhrase_0f)) {hotPhrase_recognized = hotPhrase_0f;}
+        if (recognizedSpeech.contains(hotPhrase_0g)) {hotPhrase_recognized = hotPhrase_0g;}
+        if (recognizedSpeech.contains(hotPhrase_0h)) {hotPhrase_recognized = hotPhrase_0h;}
+        if (recognizedSpeech.contains(hotPhrase_0i)) {hotPhrase_recognized = hotPhrase_0i;}
+        if (recognizedSpeech.contains(hotPhrase_0j)) {hotPhrase_recognized = hotPhrase_0j;}
+        if (recognizedSpeech.contains(hotPhrase_0k)) {hotPhrase_recognized = hotPhrase_0k;}
+        if (recognizedSpeech.contains(hotPhrase_0l)) {hotPhrase_recognized = hotPhrase_0l;}
+
         if (recognizedSpeech.contains(hotPhrase_1)) {hotPhrase_recognized = hotPhrase_1;}
 
-        if (recognizedSpeech.contains(hotPhrase_0a) || recognizedSpeech.contains(hotPhrase_0b) || recognizedSpeech.contains(hotPhrase_0c) || recognizedSpeech.contains(hotPhrase_0d) || recognizedSpeech.contains(hotPhrase_0e))
+        if (recognizedSpeech.contains(hotPhrase_0a) ||
+            recognizedSpeech.contains(hotPhrase_0b) ||
+            recognizedSpeech.contains(hotPhrase_0c) ||
+            recognizedSpeech.contains(hotPhrase_0d) ||
+            recognizedSpeech.contains(hotPhrase_0e) ||
+            recognizedSpeech.contains(hotPhrase_0f) ||
+            recognizedSpeech.contains(hotPhrase_0g) ||
+            recognizedSpeech.contains(hotPhrase_0h) ||
+            recognizedSpeech.contains(hotPhrase_0i) ||
+            recognizedSpeech.contains(hotPhrase_0j) ||
+            recognizedSpeech.contains(hotPhrase_0k) ||
+            recognizedSpeech.contains(hotPhrase_0l))
         {
             int index_tellMeAbout = recognizedSpeech.indexOf(hotPhrase_recognized);
             int index_start = index_tellMeAbout + hotPhrase_recognized.length();
@@ -765,7 +798,10 @@ public class ConverserActivity extends Activity
                     String tokenString = request_uploadImage.getBody().toString();
                     Log.d("foo", tokenString);
                     //String token = tokenString.substring(10, tokenString.length() - 2);
-                    imageRecognitionRequestToken = tokenString.substring(10, tokenString.length() - 2);
+                    //imageRecognitionRequestToken = tokenString.substring(10, tokenString.length() - 2);  //used to work
+                    Log.d("foo", "*****************    " + tokenString);
+                    int index_firstComma = tokenString.indexOf(",");
+                    imageRecognitionRequestToken = tokenString.substring(10, index_firstComma-1);
                     Log.d("foo", imageRecognitionRequestToken);
 
                 } catch (UnirestException e)
